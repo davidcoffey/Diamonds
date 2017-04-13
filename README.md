@@ -1,9 +1,9 @@
 # Diamonds
 This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
 
-### Installation instructions
+### Installation instructions for MacOS
 
-#### Setup DNS server using unixODBC and freeTDS to be used by RODBC (MacOS)
+#### Setup DNS server using unixODBC and freeTDS to be used by RODBC
 
 ###### Install brew if you do not have it already
 ```
@@ -94,4 +94,4 @@ devtools::install_github("davidcoffey/Diamonds")
 
 ### Useful links
 * [Setup ODBC for R on OS X](http://hiltmon.com/blog/2013/09/18/setup-odbc-for-r-on-os-x/)
-* [How to install RODBC on Mac OS X Yosemite with unixodbc and freetds](http://hiltmon.com/blog/2013/09/18/setup-odbc-for-r-on-os-x/)
+* [How to install RODBC on Mac OS X Yosemite with unixodbc and freetds](http://stackoverflow.com/questions/31907247/how-do-i-install-rodbc-on-mac-os-x-yosemite-with-unixodbc-and-freetds)
