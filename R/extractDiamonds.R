@@ -16,7 +16,7 @@
 #' @return Returns a data frame with patient observations from the Diamonds database.
 #' @export
 #' @importFrom reshape melt cast
-
+#' @import stringr
 extractDiamonds <- function(channel, demographics = TRUE, observations,
                             patients, format = "raw") {
     observations <- paste(observations, collapse = "', '")
@@ -91,6 +91,14 @@ extractDiamonds <- function(channel, demographics = TRUE, observations,
         data$ObservationDate = as.Date(data$ObservationDate, format = "%Y-%m-%d")
         data = data[order(data$PatientMRN, data$ObservationDate),]
     }
+
+    data$ObservationValueNumeric = ifelse(grepl(pattern = "too small|no spike|polyclonal|normal|oligoclonal|no bence jones|not detectable|not seen", data$ObservationValue, ignore.case = TRUE), 0,
+                                          ifelse(grepl(pattern ="g/d|g/24|grams per 24 hours", data$ObservationValue, ignore.case = TRUE),
+                                                as.numeric(gsub(pattern = "[[:space:]]|[[:alpha:]]|/|=|24", replacement = "", stringr::str_match(stringr::str_to_lower(data$ObservationValue), ".....g/d|.....g/24|.....grams per 24 hours"))),
+                                           ifelse(grepl(pattern ="pg/mL|ng/mL", data$ObservationValue, ignore.case = TRUE),
+                                                 as.numeric(gsub(pattern = "[[:space:]]|[[:alpha:]]|/|:|(|)", replacement = "", stringr::str_match(stringr::str_matchstr_to_lower(data$ObservationValue), ":......"))),
+                                            as.numeric(data$ObservationValueNumeric))))
+
     if(format == "raw") {
         return(data)
     }
