@@ -1,9 +1,9 @@
 # Diamonds
 This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
 
-### Installation instructions
+### Installation instructions for MacOS
 
-#### Setup DNS server using unixODBC and freeTDS to be used by RODBC (MacOS)
+#### Setup DNS server using unixODBC and freeTDS to be used by RODBC
 
 ###### Install brew if you do not have it already
 ```
