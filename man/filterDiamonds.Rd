@@ -12,7 +12,7 @@ filterDiamonds(data, timepoints, range = "within", within = c(-14, 14),
 
 \item{timepoints}{A data frame with the first column being the patient
 medical record numbers and the second being the desired dates to filter
-aroud (e.g. date of diagnosis or date of treatment).  There may be multiple
+around (e.g. date of diagnosis or date of treatment).  There may be multiple
 dates per patient.}
 
 \item{range}{A character vector specifying the range of dates for each time
@@ -23,7 +23,7 @@ the "within" argument.}
 \item{within}{An integer vector of length 2 providing the number of dates
 before and after each time point to filter.  For example, c(-14, 14) would
 indicate that all dates less than or greater than 14 days of the specified
-time point are be filtered.}
+time point are to be filtered.}
 
 \item{format}{A character vector indicating the output format.  Options
 include "raw", "byObservationId", "byDaysFromFirstTimePoint", or
@@ -35,5 +35,5 @@ filtered by the desired time points database.  A new column is added giving
 the number of days from the first specified time point.
 }
 \description{
-Filters extracted Diamond data by specified time points.
+Filters extracted Diamonds data by specified time points.
 }
