@@ -4,7 +4,7 @@
 \alias{plotDiamonds}
 \title{Plot diamonds data}
 \usage{
-plotDiamonds(data, chart, by)
+plotDiamonds(data, chart, by, interactive = FALSE)
 }
 \arguments{
 \item{data}{A data frame extracted from the Diamonds database in "raw" format.}
@@ -15,6 +15,9 @@ plotDiamonds(data, chart, by)
 \item{by}{A character vector indicating whether the plots should be iterated
 by patient or observation.  Available options include "PatientMRN" and
 "ObservationId".}
+
+\item{interactive}{A Boolean indicating if the plot should interactive.  If
+TRUE then plot is interactive, if FALSE then the plot is static.}
 }
 \value{
 Returns a histogram, density plot, blox plot, or line plot in ggplot

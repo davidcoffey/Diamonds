@@ -3,6 +3,8 @@
 export(extractDiamonds)
 export(plotDiamonds)
 import(ggplot2)
+import(plotly)
+import(stringr)
 importFrom(RColorBrewer,brewer.pal)
 importFrom(reshape,cast)
 importFrom(reshape,melt)

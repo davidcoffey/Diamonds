@@ -9,20 +9,23 @@
 #' @param by A character vector indicating whether the plots should be iterated
 #' by patient or observation.  Available options include "PatientMRN" and
 #' "ObservationId".
+#' @param interactive A Boolean indicating if the plot should interactive.  If
+#' TRUE then plot is interactive, if FALSE then the plot is static.
 #' @return Returns a histogram, density plot, blox plot, or line plot in ggplot
 #' sytle.
 #' @export
 #' @import ggplot2
+#' @import plotly
 #' @importFrom RColorBrewer brewer.pal
 
-plotDiamonds <- function(data, chart, by){
+plotDiamonds <- function(data, chart, by, interactive = FALSE){
     data = data[!is.na(data$ObservationValueNumeric),]
     if(by == "ObservationId"){
         if(chart == "histogram"){
             ncolumns <- length(levels(data$ObservationId))
             ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
             ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = PatientMRN)) +
                 facet_wrap(~ObservationId, scales = "free", ncol = ncolumns) +
                 geom_histogram(bins = 30) +
@@ -34,7 +37,7 @@ plotDiamonds <- function(data, chart, by){
             ncolumns <- length(levels(data$ObservationId))
             ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
             ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = PatientMRN)) +
                 facet_wrap(~ObservationId, scales = "free", ncol = ncolumns) +
                 geom_density(alpha = 0.7) +
@@ -56,7 +59,7 @@ plotDiamonds <- function(data, chart, by){
             ncolumns <- round(ifelse(ncolumns < 7, 1, ncolumns/6), digits = 0)
             nrows <- length(levels(data$ObservationId))
             ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = DaysFromFirstObservation,
                                            y = ObservationValueNumeric,
                                            group = PatientMRN,
@@ -74,7 +77,7 @@ plotDiamonds <- function(data, chart, by){
             ncolumns <- length(levels(data$PatientMRN))
             ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
             ncolors <- length(levels(data$ObservationId))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = ObservationId)) +
                 facet_wrap(~PatientMRN, scales = "free", ncol = ncolumns) +
                 geom_histogram(bins = 30) +
@@ -86,7 +89,7 @@ plotDiamonds <- function(data, chart, by){
             ncolumns <- length(levels(data$PatientMRN))
             ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
             ncolors <- length(levels(data$ObservationId))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = ObservationId)) +
                 facet_wrap(~PatientMRN, scales = "free", ncol = ncolumns) +
                 geom_density(alpha = 0.7) +
@@ -109,7 +112,7 @@ plotDiamonds <- function(data, chart, by){
             ncolumns <- round(ifelse(ncolumns < 7, 1, ncolumns/6), digits = 0)
             nrows <- length(levels(data$PatientMRN))
             ncolors <- length(levels(data$ObservationId))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9, ncolors, 9), "Set1"))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
             p <- ggplot2::ggplot(data, aes(x = DaysFromFirstObservation,
                                            y = ObservationValueNumeric,
                                            group = ObservationId,
@@ -122,5 +125,10 @@ plotDiamonds <- function(data, chart, by){
                 labs(x = "Days from first observation", y = "Observation value", color = "Observation")
         }
     }
-    return(p)
+    if(interactive == TRUE){
+        return(plotly::ggplotly(p, tooltip = c("y", "x", "colour")))
+    }else{
+        return(p)
+    }
+
 }
