@@ -15,7 +15,7 @@
 #' sytle.
 #' @export
 #' @import ggplot2
-#' @import plotly
+#' @importFrom plotly ggplotly
 #' @importFrom RColorBrewer brewer.pal
 
 plotDiamonds <- function(data, chart, by, interactive = FALSE){

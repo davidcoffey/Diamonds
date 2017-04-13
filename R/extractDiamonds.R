@@ -103,21 +103,21 @@ extractDiamonds <- function(channel, demographics = TRUE, observations,
         return(data)
     }
     if(format == "byObservationId") {
-        melt <- melt(data, id = c("PatientMRN", "ObservationDate", "ObservationId"),
+        melt <- reshape::melt(data, id = c("PatientMRN", "ObservationDate", "ObservationId"),
                      measure.vars = c("ObservationValueNumeric"))
-        cast <- cast(melt, PatientMRN + ObservationDate ~ ObservationId, mean)
+        cast <- reshape::cast(melt, PatientMRN + ObservationDate ~ ObservationId, mean)
         return(cast)
     }
     if(format == "byDaysFromFirstObservation") {
-        melt <- melt(data, id = c("PatientMRN", "DaysFromFirstObservation", "ObservationId"),
+        melt <- reshape::melt(data, id = c("PatientMRN", "DaysFromFirstObservation", "ObservationId"),
                      measure.vars = c("ObservationValueNumeric"))
-        cast <- cast(melt, PatientMRN + ObservationId ~ DaysFromFirstObservation, mean, fill = "")
+        cast <- reshape::cast(melt, PatientMRN + ObservationId ~ DaysFromFirstObservation, mean, fill = "")
         return(cast)
     }
     if(format == "byObservationDate") {
-        melt <- melt(data, id = c("PatientMRN", "ObservationDate", "ObservationId"),
+        melt <- reshape::melt(data, id = c("PatientMRN", "ObservationDate", "ObservationId"),
                      measure.vars = c("ObservationValueNumeric"))
-        cast <- cast(melt, PatientMRN + ObservationId ~ ObservationDate, mean, fill = "")
+        cast <- reshape::cast(melt, PatientMRN + ObservationId ~ ObservationDate, mean, fill = "")
         return(cast)
     }
 }
