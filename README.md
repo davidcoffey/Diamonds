@@ -1,4 +1,4 @@
-# Diamonds
+# Diamonds v0.1.1
 This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
 
 ### Installation instructions for MacOS
