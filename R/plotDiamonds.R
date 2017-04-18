@@ -1,134 +1,107 @@
 #' Plot diamonds data
 #'
-#' Plots extracted data from the Diamonds database as a histogram, density plot,
-#' blox plot, or line plot.
+#' Plots a single observation as line plot or box plot.
 #'
-#' @param data A data frame extracted from the Diamonds database in "raw" format.
+#' @param data A data frame extracted from Diamonds in the `raw`` format.
 #' @param chart A character vector of the chart type.  Available options include
-#' "histogram", "density", "box", "line".
-#' @param by A character vector indicating whether the plots should be iterated
-#' by patient or observation.  Available options include "PatientMRN" and
-#' "ObservationId".
+#' "line" or "box".
+#' @param observation A character vector of a single ObservationId to be plotted.
+#' @param groups A Boolean indicating if the data should be grouped.  If this
+#' option is selected, filter the data first using the filterDiamonds function
+#' and specify a grouping variable.
+#' @param id A Boolean indicating if the patient medical record numbers should
+#' be replaced with patient IDs.  If this option is selected, filter the data
+#' first using the filterDiamonds function and specify IDs.
+#' @param timepoint A Boolean indicating if the the name of the time point should
+#' be displayed in place of the nubmer of days since the first time point.  If
+#' this option is selected, filter the data first using the filterDiamonds
+#' function and time points.
 #' @param interactive A Boolean indicating if the plot should interactive.  If
 #' TRUE then plot is interactive, if FALSE then the plot is static.
-#' @return Returns a histogram, density plot, blox plot, or line plot in ggplot
-#' sytle.
+#' @return Returns a line plot or box plot in ggplot sytle.
 #' @export
 #' @import ggplot2
 #' @importFrom plotly ggplotly
 #' @importFrom RColorBrewer brewer.pal
+#' @importFrom gtools mixedsort
+plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE, groups = FALSE, interactive = FALSE){
+    if(length(observation) > 1){stop("More than one observation specified", call. = FALSE)}
+    data = data[!is.na(data$ObservationValueNumeric) & data$ObservationId %in% observation,]
 
-plotDiamonds <- function(data, chart, by, interactive = FALSE){
-    data = data[!is.na(data$ObservationValueNumeric),]
-    if(by == "ObservationId"){
-        if(chart == "histogram"){
-            ncolumns <- length(levels(data$ObservationId))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = PatientMRN)) +
-                facet_wrap(~ObservationId, scales = "free", ncol = ncolumns) +
-                geom_histogram(bins = 30) +
-                theme_minimal() +
-                scale_fill_manual(values = getPalette(ncolors)) +
-                labs(x = "Observation value", y = "Count")
-        }
-        if(chart == "density"){
-            ncolumns <- length(levels(data$ObservationId))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = PatientMRN)) +
-                facet_wrap(~ObservationId, scales = "free", ncol = ncolumns) +
-                geom_density(alpha = 0.7) +
-                theme_minimal() +
-                scale_fill_manual(values = getPalette(ncolors)) +
-                labs(x = "Observation value", y = "Density")
-        }
-        if(chart == "box"){
-            ncolumns <- length(levels(data$ObservationId))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            p <- ggplot2::ggplot(data, aes(x = ObservationId, y = ObservationValueNumeric)) +
-                facet_wrap(~ObservationId, scales = "free", ncol = ncolumns) +
-                geom_boxplot(outlier.size = 0.5) +
-                theme_minimal() +
-                labs(x = "", y = "Observation value")
-        }
-        if(chart == "line"){
-            ncolumns <- length(levels(data$ObservationId))
-            ncolumns <- round(ifelse(ncolumns < 7, 1, ncolumns/6), digits = 0)
-            nrows <- length(levels(data$ObservationId))
-            ncolors <- length(levels(data$PatientMRN))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = DaysFromFirstObservation,
-                                           y = ObservationValueNumeric,
-                                           group = PatientMRN,
-                                           color = PatientMRN)) +
-                facet_wrap(~ObservationId, scales = "free", nrow = nrows, ncol = ncolumns) +
-                geom_line() +
-                geom_point() +
-                theme_minimal() +
-                scale_color_manual(values = getPalette(ncolors)) +
-                labs(x = "Days from first observation", y = "Observation value", color = "Patient MRN")
+    if(timepoint == TRUE){
+        xaxis <- "TimePoint"
+        if(!any(names(data) == "TimePoint")){stop("There is no 'TimePoint' column in the specified data", call. = FALSE)}
+        data$TimePoint = as.factor(data$TimePoint)
+        data$TimePoint = factor(data$TimePoint, levels = gtools::mixedsort(levels(data$TimePoint)))
+        xlabel <- "Time point"
+    } else {
+        if(any(names(data) == "DaysFromFirstTimePoint")){
+            xaxis <- "DaysFromFirstTimePoint"
+            xlabel <- "Days from first time point"
+        } else {
+            xaxis <- "ObservationDate"
+            xlabel <- ""
         }
     }
-    if(by == "PatientMRN"){
-        if(chart == "histogram"){
-            ncolumns <- length(levels(data$PatientMRN))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            ncolors <- length(levels(data$ObservationId))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = ObservationId)) +
-                facet_wrap(~PatientMRN, scales = "free", ncol = ncolumns) +
-                geom_histogram(bins = 30) +
-                scale_fill_manual(values = getPalette(ncolors)) +
-                theme_minimal() +
-                labs(x = "Observation value", y = "Count")
-        }
-        if(chart == "density"){
-            ncolumns <- length(levels(data$PatientMRN))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            ncolors <- length(levels(data$ObservationId))
-            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = ObservationValueNumeric, fill = ObservationId)) +
-                facet_wrap(~PatientMRN, scales = "free", ncol = ncolumns) +
-                geom_density(alpha = 0.7) +
-                scale_fill_manual(values = getPalette(ncolors)) +
-                theme_minimal() +
-                labs(x = "Observation value", y = "Density")
-        }
+    if(id == TRUE){
+        patient <- "PatientId"
+    } else {
+        patient <- "PatientMRN"
+    }
+
+    if(groups == TRUE){
+        if(!any(names(data) == "Groups")){stop("There is no 'Groups' column in the specified data", call. = FALSE)}
         if(chart == "box"){
-            ncolumns <- length(levels(data$PatientMRN))
-            ncolumns <- round(ifelse(ncolumns < 5, 4, ncolumns/4), digits = 0)
-            p <- ggplot2::ggplot(data, aes(x = ObservationId, y = ObservationValueNumeric)) +
-                facet_wrap(~PatientMRN, scales = "free", ncol = ncolumns) +
-                geom_boxplot(outlier.size = 0.5) +
-                theme_minimal() +
-                theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
-                labs(x = "", y = "Observation value")
+                p <- ggplot2::ggplot(data, aes_string(x = xaxis, y = "ObservationValueNumeric")) +
+                    facet_grid(~Groups, scales = "free") +
+                    geom_boxplot() +
+                    #coord_cartesian(ylim = quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
+                    theme_minimal() +
+                    theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
+                    labs(x = "", y = observation)
         }
         if(chart == "line"){
-            ncolumns <- length(levels(data$PatientMRN))
-            ncolumns <- round(ifelse(ncolumns < 7, 1, ncolumns/6), digits = 0)
-            nrows <- length(levels(data$PatientMRN))
-            ncolors <- length(levels(data$ObservationId))
+            ncolors <- length(levels(data$PatientMRN))
             getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
-            p <- ggplot2::ggplot(data, aes(x = DaysFromFirstObservation,
-                                           y = ObservationValueNumeric,
-                                           group = ObservationId,
-                                           color = ObservationId)) +
-                facet_wrap(~PatientMRN, scales = "free", nrow = nrows, ncol = ncolumns) +
+            p <- ggplot2::ggplot(data, aes_string(x = xaxis,
+                                           y = "ObservationValueNumeric",
+                                           group = patient,
+                                           color = patient)) +
+                facet_wrap(~Groups, scales = "free") +
+                geom_line() +
+                geom_point() +
+                theme_minimal() +
+                theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
+                scale_color_manual(values = getPalette(ncolors)) +
+                labs(x = xlabel, y = observation, color = "")
+        }
+    } else {
+        if(chart == "box"){
+            p <- ggplot2::ggplot(data, aes_string(x = xaxis, y = "ObservationValueNumeric")) +
+                #facet_wrap(~ObservationId, scales = "free") +
+                geom_boxplot() +
+                #coord_cartesian(ylim =  quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
+                theme_minimal() +
+                labs(x = "", y = observation)
+        }
+        if(chart == "line"){
+            ncolors <- length(levels(data$PatientMRN))
+            getPalette <- grDevices::colorRampPalette(RColorBrewer::brewer.pal(ifelse(ncolors < 9 & ncolors > 2, ncolors, 9), "Set1"))
+            p <- ggplot2::ggplot(data, aes_string(x = xaxis,
+                                           y = "ObservationValueNumeric",
+                                           group = patient,
+                                           color = patient)) +
+                #facet_wrap(~ObservationId, scales = "free") +
                 geom_line() +
                 geom_point() +
                 theme_minimal() +
                 scale_color_manual(values = getPalette(ncolors)) +
-                labs(x = "Days from first observation", y = "Observation value", color = "Observation")
+                labs(x = xlabel, y = observation, color = "")
         }
     }
     if(interactive == TRUE){
         return(plotly::ggplotly(p, tooltip = c("y", "x", "colour")))
-    }else{
+    } else {
         return(p)
     }
-
 }
