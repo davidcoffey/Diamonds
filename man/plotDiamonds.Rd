@@ -4,26 +4,36 @@
 \alias{plotDiamonds}
 \title{Plot diamonds data}
 \usage{
-plotDiamonds(data, chart, by, interactive = FALSE)
+plotDiamonds(data, observation, chart, id = FALSE, timepoint = FALSE,
+  groups = FALSE, interactive = FALSE)
 }
 \arguments{
-\item{data}{A data frame extracted from the Diamonds database in "raw" format.}
+\item{data}{A data frame extracted from Diamonds in the `raw`` format.}
+
+\item{observation}{A character vector of a single ObservationId to be plotted.}
 
 \item{chart}{A character vector of the chart type.  Available options include
-"histogram", "density", "box", "line".}
+"line" or "box".}
 
-\item{by}{A character vector indicating whether the plots should be iterated
-by patient or observation.  Available options include "PatientMRN" and
-"ObservationId".}
+\item{id}{A Boolean indicating if the patient medical record numbers should
+be replaced with patient IDs.  If this option is selected, filter the data
+first using the filterDiamonds function and specify IDs.}
+
+\item{timepoint}{A Boolean indicating if the the name of the time point should
+be displayed in place of the nubmer of days since the first time point.  If
+this option is selected, filter the data first using the filterDiamonds
+function and time points.}
+
+\item{groups}{A Boolean indicating if the data should be grouped.  If this
+option is selected, filter the data first using the filterDiamonds function
+and specify a grouping variable.}
 
 \item{interactive}{A Boolean indicating if the plot should interactive.  If
 TRUE then plot is interactive, if FALSE then the plot is static.}
 }
 \value{
-Returns a histogram, density plot, blox plot, or line plot in ggplot
-sytle.
+Returns a line plot or box plot in ggplot sytle.
 }
 \description{
-Plots extracted data from the Diamonds database as a histogram, density plot,
-blox plot, or line plot.
+Plots a single observation as line plot or box plot.
 }

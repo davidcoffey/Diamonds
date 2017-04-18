@@ -4,16 +4,30 @@
 \alias{filterDiamonds}
 \title{Filter diamonds}
 \usage{
-filterDiamonds(data, timepoints, range = "within", within = c(-14, 14),
-  format = "raw")
+filterDiamonds(data, patients, ids = NULL, dates, timepoints = NULL,
+  groups = NULL, range = "on", within = NULL, format = "raw",
+  na.rm = FALSE)
 }
 \arguments{
 \item{data}{A data frame extracted from the Diamonds database in "raw" format.}
 
-\item{timepoints}{A data frame with the first column being the patient
-medical record numbers and the second being the desired dates to filter
-around (e.g. date of diagnosis or date of treatment).  There may be multiple
-dates per patient.}
+\item{patients}{A required character vector of patient medical record numbers.}
+
+\item{ids}{An optional character vector of patient identifiers in the same
+order as patients.  If provided, a new column titled "PatientId" is added
+to the output data frame.}
+
+\item{dates}{A required date vector in the same order as patients
+corresponding to the dates to filter the data with.  There may be multiple
+dates per patient as long as the order remains the same.}
+
+\item{timepoints}{An optional character vector in the same order as dates
+corresponding to a description of the timepoint.  If provided, a new column
+titled "TimePoints" is added to the output data frame.}
+
+\item{groups}{An optional character vector of patient groupings in the same
+order as patients.  If provided, a new column titled "Groups" is added
+to the output data frame.}
 
 \item{range}{A character vector specifying the range of dates for each time
 point to be extracted.  Available options include "on", "before", "after",
@@ -26,14 +40,18 @@ indicate that all dates less than or greater than 14 days of the specified
 time point are to be filtered.}
 
 \item{format}{A character vector indicating the output format.  Options
-include "raw", "byObservationId", "byDaysFromFirstTimePoint", or
-"byObservationDate".}
+include "raw", "byObservationId", "byDaysFromFirstTimePoint",
+"byObservationDate", or "byTimePoint".}
+
+\item{na.rm}{A Boolean indicating whether rows with NA valules in the
+ObservationValueNumeric column should be removed.}
 }
 \value{
 Returns a data frame with patient observations from the Diamonds
-filtered by the desired time points database.  A new column is added giving
-the number of days from the first specified time point.
+filtered by the desired dates.  A new column is added giving
+the number of days from the first specified time point.  Optionally, additional
+columns for Groups, Timepoints, and PatientIds are added if specified.
 }
 \description{
-Filters extracted Diamonds data by specified time points.
+Filters and renames extracted Diamonds data by specified time points.
 }

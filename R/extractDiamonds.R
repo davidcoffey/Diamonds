@@ -106,6 +106,7 @@ extractDiamonds <- function(channel, demographics = TRUE, observations,
         melt <- reshape::melt(data, id = c("PatientMRN", "ObservationDate", "ObservationId"),
                      measure.vars = c("ObservationValueNumeric"))
         cast <- reshape::cast(melt, PatientMRN + ObservationDate ~ ObservationId, mean)
+
         return(cast)
     }
     if(format == "byDaysFromFirstObservation") {
