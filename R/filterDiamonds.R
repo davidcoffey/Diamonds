@@ -86,10 +86,10 @@ filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                      measure.vars = c("ObservationValueNumeric"))
         cast <- reshape::cast(melt, PatientMRN + ObservationDate ~ ObservationId, mean, fill ="")
         if(!is.null(groups)){
-            cast <- merge(data.frame(PatientMRN = patients, Groups = groups), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
         if(!is.null(ids)){
-            cast <- merge(data.frame(PatientMRN = patients, PatientId = ids), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, PatientId = ids)), cast)
         }
         return(cast)
     }
@@ -98,10 +98,10 @@ filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                      measure.vars = c("ObservationValueNumeric"))
         cast <- reshape::cast(melt, PatientMRN + ObservationId ~ DaysFromFirstTimePoint, mean, fill = "")
         if(!is.null(groups)){
-            cast <- merge(data.frame(PatientMRN = patients, Groups = groups), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
         if(!is.null(ids)){
-            cast <- merge(data.frame(PatientMRN = patients, PatientId = ids), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, PatientId = ids)), cast)
         }
         return(cast)
     }
@@ -110,10 +110,10 @@ filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                      measure.vars = c("ObservationValueNumeric"))
         cast <- reshape::cast(melt, PatientMRN + ObservationId ~ ObservationDate, mean, fill = "")
         if(!is.null(groups)){
-            cast <- merge(data.frame(PatientMRN = patients, Groups = groups), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
         if(!is.null(ids)){
-            cast <- merge(data.frame(PatientMRN = patients, PatientId = ids), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, PatientId = ids)), cast)
         }
         return(cast)
     }
@@ -122,10 +122,10 @@ filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                               measure.vars = c("ObservationValueNumeric"))
         cast <- reshape::cast(melt, PatientMRN + ObservationId ~ TimePoint, mean, fill = "")
         if(!is.null(groups)){
-            cast <- merge(data.frame(PatientMRN = patients, Groups = groups), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
         if(!is.null(ids)){
-            cast <- merge(data.frame(PatientMRN = patients, PatientId = ids), cast)
+            cast <- merge(unique(data.frame(PatientMRN = patients, PatientId = ids)), cast)
         }
         return(cast)
     }
