@@ -22,10 +22,10 @@ brew install freetds --with-unixodbc
 ```
 nano /usr/local/Cellar/freetds/1.00.9/etc/freetds.conf
 
-	[NILE-H]
-		host = 140.107.116.188
+	[CONGO-H]
+		host = 140.107.116.197
 		instance = H
-		port = 52000
+		port = 51000
 		tds version = 7.0
 ```
 
@@ -33,10 +33,10 @@ nano /usr/local/Cellar/freetds/1.00.9/etc/freetds.conf
 ```
 nano /usr/local/Cellar/unixodbc/2.3.4/etc/odbc.ini
 
-	[NILE-H]
+	[CONGO-H]
 		DRIVER = FreeTDS
 		Description = ODBC INI FILE
-		ServerName = NILE-H
+		ServerName = CONGO-H
 		Instance = H
 ```
 ###### Use a text editor like nano to edit the odbcinst.ini file
@@ -52,7 +52,7 @@ nano /usr/local/Cellar/unixodbc/2.3.4/etc/odbcinst.ini
 
 ###### Test DNS connection
 ```
-tsql -S NILE-H -U 'fhcrc\username'
+tsql -S CONGO-H -U 'fhcrc\username'
 ```
 
 ###### Create symbolic links to the above edited files to your home directory
@@ -64,7 +64,7 @@ ln -sF /usr/local/Cellar/unixodbc/2.3.4/etc/odbcinst.ini ~/.odbcinst.ini
 
 ###### Use a text editor like nano to edit your Rprofile file (**this and the following step will need to be repeated every time R is updated**)
 ```
-nano /Library/Frameworks/R.framework/Versions/3.3/Resources/library/base/R/Rprofile
+nano /Library/Frameworks/R.framework/Versions/3.4/Resources/library/base/R/Rprofile
 
 	Sys.setenv(ODBC_INCLUDE="/usr/local/include")
 	Sys.setenv(ODBC_LIBS="/usr/local/lib")
@@ -83,7 +83,7 @@ odbcDataSources()
 
 ###### Connect to DNS server in R
 ```
-channel <- odbcConnect("NILE-H", uid = "fhcrc\\username", pwd = "**********")
+channel <- odbcConnect("CONGO-H", uid = "fhcrc\\username", pwd = "**********")
 ```
 
 #### Download Diamonds package from GitHub in R
