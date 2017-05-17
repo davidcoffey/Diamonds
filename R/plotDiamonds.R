@@ -27,34 +27,38 @@
 plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE, groups = FALSE, interactive = FALSE){
     if(length(observation) > 1){stop("More than one observation specified", call. = FALSE)}
     data = data[!is.na(data$ObservationValueNumeric) & data$ObservationId %in% observation,]
-
+    if(id == TRUE){
+        patient <- "PatientId"
+    } else {
+        patient <- "PatientMRN"
+    }
     if(timepoint == TRUE){
         xaxis <- "TimePoint"
         if(!any(names(data) == "TimePoint")){stop("There is no 'TimePoint' column in the specified data", call. = FALSE)}
         data$TimePoint = as.factor(data$TimePoint)
         data$TimePoint = factor(data$TimePoint, levels = gtools::mixedsort(levels(data$TimePoint)))
-        xlabel <- "Time point"
+        xlabel <- ""
     } else {
         if(any(names(data) == "DaysFromFirstTimePoint")){
-            xaxis <- "DaysFromFirstTimePoint"
-            xlabel <- "Days from first time point"
+            if(chart == "line") {
+                xaxis <- "DaysFromFirstTimePoint"
+                xlabel <- "Days from first time point"
+            } else {
+                xaxis <- patient
+            }
+
         } else {
             xaxis <- "ObservationDate"
             xlabel <- ""
         }
-    }
-    if(id == TRUE){
-        patient <- "PatientId"
-    } else {
-        patient <- "PatientMRN"
     }
 
     if(groups == TRUE){
         if(!any(names(data) == "Groups")){stop("There is no 'Groups' column in the specified data", call. = FALSE)}
         if(chart == "box"){
                 p <- ggplot2::ggplot(data, aes_string(x = xaxis, y = "ObservationValueNumeric")) +
-                    facet_grid(~Groups, scales = "free") +
-                    geom_boxplot() +
+                    facet_grid(~Groups) +
+                    geom_boxplot(outlier.size = 1, outlier.color = "grey") +
                     #coord_cartesian(ylim = quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
                     theme_minimal() +
                     theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
@@ -67,7 +71,7 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                                            y = "ObservationValueNumeric",
                                            group = patient,
                                            color = patient)) +
-                facet_wrap(~Groups, scales = "free") +
+                facet_wrap(~Groups) +
                 geom_line() +
                 geom_point() +
                 theme_minimal() +
@@ -78,10 +82,11 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
     } else {
         if(chart == "box"){
             p <- ggplot2::ggplot(data, aes_string(x = xaxis, y = "ObservationValueNumeric")) +
-                #facet_wrap(~ObservationId, scales = "free") +
-                geom_boxplot() +
+                #facet_wrap(~ObservationId) +
+                geom_boxplot(outlier.size = 1, outlier.color = "grey") +
                 #coord_cartesian(ylim =  quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
                 theme_minimal() +
+                theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
                 labs(x = "", y = observation)
         }
         if(chart == "line"){
@@ -91,10 +96,11 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                                            y = "ObservationValueNumeric",
                                            group = patient,
                                            color = patient)) +
-                #facet_wrap(~ObservationId, scales = "free") +
+                #facet_wrap(~ObservationId) +
                 geom_line() +
                 geom_point() +
                 theme_minimal() +
+                theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
                 scale_color_manual(values = getPalette(ncolors)) +
                 labs(x = xlabel, y = observation, color = "")
         }
