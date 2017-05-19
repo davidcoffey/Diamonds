@@ -43,8 +43,8 @@ time point are to be filtered.}
 include "raw", "byObservationId", "byDaysFromFirstTimePoint",
 "byObservationDate", or "byTimePoint".}
 
-\item{na.rm}{A Boolean indicating whether rows with NA valules in the
-ObservationValueNumeric column should be removed.}
+\item{na.rm}{A Boolean indicating whether rows with NA valules should be
+removed.}
 }
 \value{
 Returns a data frame with patient observations from the Diamonds
