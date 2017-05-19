@@ -27,14 +27,15 @@
 #' @param format A character vector indicating the output format.  Options
 #' include "raw", "byObservationId", "byDaysFromFirstTimePoint",
 #' "byObservationDate", or "byTimePoint".
-#' @param na.rm A Boolean indicating whether rows with NA valules in the
-#' ObservationValueNumeric column should be removed.
+#' @param na.rm A Boolean indicating whether rows with NA valules should be
+#' removed.
 #' @return Returns a data frame with patient observations from the Diamonds
 #' filtered by the desired dates.  A new column is added giving
 #' the number of days from the first specified time point.  Optionally, additional
 #' columns for Groups, Timepoints, and PatientIds are added if specified.
 #' @export
 #' @importFrom reshape melt cast
+#' @importFrom stats na.omit
 filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                            groups = NULL, range = "on", within = NULL,
                            format = "raw", na.rm = FALSE) {
@@ -61,7 +62,8 @@ filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         }
         filtered$DaysFromFirstTimePoint <- as.integer(filtered$ObservationDate - min(as.Date(dates[which(patients == patient)])))
         if(na.rm == TRUE){
-            filtered = filtered[!is.na(filtered$ObservationValueNumeric), ]
+            #filtered = filtered[!is.na(filtered$ObservationValueNumeric), ]
+            filtered = na.omit(filtered)
         }
         if(nrow(filtered) != 0){
             if(!is.null(ids)){
