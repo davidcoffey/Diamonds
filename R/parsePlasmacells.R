@@ -9,7 +9,7 @@
 #' \describe{
 #' \item{pattern1}{"\\\\d+\\.*\\\\d*\%plasmacells[^:0-9]"}
 #' \item{pattern2}{"plasmacells:\\\\d+\\\\.*\\\\d*\%|plasmacells\\\\d+\\\\.*\\\\d*\%"}
-#' \item{pattern3}{".\{50\}CD138.\{50\}|.\{50\}plasma.\{50\}|.\{50\}abnormal.\{50\}"}
+#' \item{pattern3}{".\{1,50\}CD138.\{1,50\}|.\{1,50\}plasma.\{1,50\}|.\{1,50\}abnormal.\{1,50\}"}
 #' }
 #' @export
 #' @importFrom stringr str_extract_all str_extract str_replace_all
@@ -20,7 +20,7 @@ parsePlasmacells <- function(data){
     for(i in 1:length(pathnotes)){
         pattern1 <- "\\d+\\.*\\d*%plasmacells[^:0-9]"
         pattern2 <- "plasmacells:\\d+\\.*\\d*%|plasmacells\\d+\\.*\\d*%"
-        pattern3 <- ".{50}CD138.{50}|.{50}plasma.{50}|.{50}abnormal.{50}"
+        pattern3 <- ".{1,50}CD138.{1,50}|.{1,50}plasma.{1,50}|.{1,50}abnormal.{1,50}"
         if(str_detect(pathnotes[i], pattern = regex(pattern1, ignore_case = TRUE))){
 
             # Extract % Plasma cells (not Plasma cells: or Plasma cells #)

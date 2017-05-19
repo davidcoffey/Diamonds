@@ -20,6 +20,6 @@ Parses pathology reports for \% plasma cells
 \describe{
 \item{pattern1}{"\\\\d+\\.*\\\\d*\%plasmacells[^:0-9]"}
 \item{pattern2}{"plasmacells:\\\\d+\\\\.*\\\\d*\%|plasmacells\\\\d+\\\\.*\\\\d*\%"}
-\item{pattern3}{".\{50\}CD138.\{50\}|.\{50\}plasma.\{50\}|.\{50\}abnormal.\{50\}"}
+\item{pattern3}{".\{1,50\}CD138.\{1,50\}|.\{1,50\}plasma.\{1,50\}|.\{1,50\}abnormal.\{1,50\}"}
 }
 }
