@@ -56,4 +56,5 @@ parsePlasmacells <- function(data){
         }
     }
     plasmaCells <- merge(data[,c("PatientMRN", "ReportId", "ObservationDate")], plasmaCells)
+    return(plasmaCells)
 }
