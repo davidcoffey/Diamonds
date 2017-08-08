@@ -1,11 +1,12 @@
-#' Plot diamonds data
+#' Plot labs
 #'
-#' Plots a single observation as line plot or box plot.
+#' Plots a single lab as line plot or box plot.
 #'
 #' @param data A data frame extracted from Diamonds in the `raw`` format.
 #' @param chart A character vector of the chart type.  Available options include
 #' "line" or "box".
-#' @param observation A character vector of a single ObservationId to be plotted.
+#' @param lab A character vector of a single lab from the ObservationId column
+#' to be plotted.
 #' @param groups A Boolean indicating if the data should be grouped.  If this
 #' option is selected, filter the data first using the filterDiamonds function
 #' and specify a grouping variable.
@@ -24,9 +25,9 @@
 #' @importFrom plotly ggplotly
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom gtools mixedsort
-plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE, groups = FALSE, interactive = FALSE){
-    if(length(observation) > 1){stop("More than one observation specified", call. = FALSE)}
-    data = data[!is.na(data$ObservationValueNumeric) & data$ObservationId %in% observation,]
+plotLabs <- function(data, lab, chart, id = FALSE, timepoint = FALSE, groups = FALSE, interactive = FALSE){
+    if(length(lab) > 1){stop("More than one lab specified", call. = FALSE)}
+    data = data[!is.na(data$ObservationValueNumeric) & data$ObservationId %in% lab,]
     if(id == TRUE){
         patient <- "PatientId"
     } else {
@@ -62,7 +63,7 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                     #coord_cartesian(ylim = quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
                     theme_minimal() +
                     theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
-                    labs(x = "", y = observation)
+                    labs(x = "", y = lab)
         }
         if(chart == "line"){
             ncolors <- length(levels(data$PatientMRN))
@@ -77,7 +78,7 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                 theme_minimal() +
                 theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
                 scale_color_manual(values = getPalette(ncolors)) +
-                labs(x = xlabel, y = observation, color = "")
+                labs(x = xlabel, y = lab, color = "")
         }
     } else {
         if(chart == "box"){
@@ -87,7 +88,7 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                 #coord_cartesian(ylim =  quantile(data$ObservationValueNumeric, c(0.1, 0.9))) +
                 theme_minimal() +
                 theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
-                labs(x = "", y = observation)
+                labs(x = "", y = lab)
         }
         if(chart == "line"){
             ncolors <- length(levels(data$PatientMRN))
@@ -102,7 +103,7 @@ plotDiamonds <- function(data, observation, chart, id = FALSE, timepoint = FALSE
                 theme_minimal() +
                 theme(axis.text.x = element_text(angle=90, vjust=0.5, hjust = 1)) +
                 scale_color_manual(values = getPalette(ncolors)) +
-                labs(x = xlabel, y = observation, color = "")
+                labs(x = xlabel, y = lab, color = "")
         }
     }
     if(interactive == TRUE){
