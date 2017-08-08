@@ -1,4 +1,4 @@
-#' Filter diamonds
+#' Filter labs
 #'
 #' Filters and renames extracted Diamonds data by specified time points.
 #'
@@ -36,7 +36,7 @@
 #' @export
 #' @importFrom reshape melt cast
 #' @importFrom stats na.omit
-filterDiamonds <- function(data, patients, ids = NULL, dates, timepoints = NULL,
+filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                            groups = NULL, range = "on", within = NULL,
                            format = "raw", na.rm = FALSE) {
     if(!length(patients) == length(dates)){stop("The length of patients and dates are not the same", call. = FALSE)}
