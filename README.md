@@ -1,9 +1,9 @@
-# Diamonds v0.1.3
+# Diamonds v0.1.4
 This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
 
 ### Installation instructions for MacOS
 
-#### Setup DNS server using unixODBC and freeTDS to be used by RODBC
+#### Setup DNS server using unixODBC and freeTDS to be used by odbc
 
 ###### Install brew if you do not have it already
 ```
@@ -70,20 +70,21 @@ nano /Library/Frameworks/R.framework/Versions/3.4/Resources/library/base/R/Rprof
 	Sys.setenv(ODBC_LIBS="/usr/local/lib")
 ```
 
-###### Downlaod [RODBC v1.3.-12](https://cran.r-project.org/src/contrib/Archive/RODBC/) (newer versions don’t work) and install in R
+###### Install odbc in R
 ```
-install.packages("~/Downloads/RODBC_1.3-12.tar", repos=NULL, type="source")
+install.packages("odbc")
 ```
 
 ###### Test DNS setup in R
 ```
-library(RODBC)
-odbcDataSources()
+library(odbc)
+odbc::odbcListDrivers()
 ```
 
 ###### Connect to DNS server in R
 ```
-channel <- odbcConnect("CONGO-H", uid = "fhcrc\\username", pwd = "**********")
+library(DBI)
+channel <- DBI::dbConnect(odbc::odbc(), "CONGO-H", uid = "fhcrc\\username", pwd = rstudioapi::askForPassword("Database password"))
 ```
 
 #### Download Diamonds package from GitHub in R
@@ -93,5 +94,6 @@ devtools::install_github("davidcoffey/Diamonds")
 ```
 
 ### Useful links
-* [Setup ODBC for R on OS X](http://hiltmon.com/blog/2013/09/18/setup-odbc-for-r-on-os-x/)
-* [How to install RODBC on Mac OS X Yosemite with unixodbc and freetds](http://stackoverflow.com/questions/31907247/how-do-i-install-rodbc-on-mac-os-x-yosemite-with-unixodbc-and-freetds)
+* [Setting up ODBC Drivers](http://db.rstudio.com/drivers)
+* [Microsoft SQL Connection Settings](http://db.rstudio.com/microsoft-sql-server/)
+* [ODBC R package installation](https://github.com/rstats-db/odbc)

@@ -1,11 +1,11 @@
 Package: Diamonds
 Type: Package
 Title: For clinical data mining of the Diamonds database
-Version: 0.1.3
+Version: 0.1.4
 Author: David Coffey, MD
 Maintainer: David Coffey <dcoffey@fredhutch.org>
 Description: This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
-Imports: ggplot2, reshape, RColorBrewer, plotly, stringr, gtools, plyr, stats
+Imports: ggplot2, reshape, RColorBrewer, plotly, stringr, gtools, plyr, stats, odbc
 Depends: R (>= 3.3)
 License: Artistic-2.0
 Encoding: UTF-8
