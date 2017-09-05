@@ -4,7 +4,8 @@
 \alias{parseKaryotype}
 \title{Parse FISH karyotype strings}
 \usage{
-parseKaryotype(data, probes, unmathced = TRUE, karyotype = TRUE)
+parseKaryotype(data, probes, unmatched = TRUE, karyotype = TRUE,
+  deduplicate = TRUE)
 }
 \arguments{
 \item{data}{A data frame with columns named "PatientMRN", "ReportId",
@@ -13,11 +14,14 @@ parseKaryotype(data, probes, unmathced = TRUE, karyotype = TRUE)
 \item{probes}{A data frame with columns named "probe" and "chr" that defines
 the gene name and chromosomal location of the gene (e.g. 17p)}
 
+\item{unmatched}{A Boolean indicating if unmatched reports should be included in the output.
+If TRUE, then reports for which no FISH strings are detected or pattern matching cannot be performed are included in the output.}
+
 \item{karyotype}{A Boolean indicating if the original karyotype string should be included in the output.
 If TRUE, then the karyotype string is included.}
 
-\item{unmatched}{A Boolean indicating if unmatched reports should be included in the output.
-If TRUE, then reports for which no FISH strings are detected or pattern matching cannot be performed are included in the output.}
+\item{deduplicate}{A Boolean indicating if duplicate clones with the same abnormality should be removed.  If TRUE, then duplicate
+clones are removed and the columns for Gene and Copy number of omited from the output.  Be aware that when this option is set to TRUE, it will increase the computation time.}
 }
 \value{
 Returns a data frame where each row represents a clone from the

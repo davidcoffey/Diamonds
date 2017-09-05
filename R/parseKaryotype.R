@@ -10,6 +10,8 @@
 #' If TRUE, then reports for which no FISH strings are detected or pattern matching cannot be performed are included in the output.
 #' @param karyotype A Boolean indicating if the original karyotype string should be included in the output.
 #' If TRUE, then the karyotype string is included.
+#' @param deduplicate A Boolean indicating if duplicate clones with the same abnormality should be removed.  If TRUE, then duplicate
+#' clones are removed and the columns for Gene and Copy number of omited from the output.  Be aware that when this option is set to TRUE, it will increase the computation time.
 #' @return Returns a data frame where each row represents a clone from the
 #' FISH karyotype string.
 #' @details The five patterns below are recognized.  Pattern matching is case insensative.  Matched patterns are exluded if they do not contain a known probe.
@@ -24,7 +26,7 @@
 #' @importFrom plyr ldply
 #' @importFrom stringr str_extract_all str_extract
 #' @importFrom stats na.omit
-parseKaryotype <- function(data, probes, unmathced = TRUE, karyotype = TRUE) {
+parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, deduplicate = TRUE) {
     # Create regular expression pattern to matchstrings between parentheses
     pattern.clone <- "\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}\\]|\\([^()]+\\)\\[[^()]+]|\\([^()]+\\)x[[:digit:]]\\([^()]+\\)\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)\\[[^()]{1,9}]"
 
@@ -65,12 +67,13 @@ parseKaryotype <- function(data, probes, unmathced = TRUE, karyotype = TRUE) {
                                                                 ifelse(grepl(clone$Clone, pattern = "sep", ignore.case = TRUE) & grepl(clone$Clone, pattern = "MYC"), "MYC rearrangement", clone$Abnormality))))))
 
         # Merge all clones with metadata
-        metadata <- data[,c("PatientMRN", "ReportId", "Source", "ObservationDate")]
+        metadata <- unique(data[,c("PatientMRN", "ReportId", "Source", "ObservationDate")])
         clone <- merge(metadata, clone, all = FALSE)
         clones <- rbind(clones, clone)
     }
+    clones <- na.omit(clones)
 
-    # Omit +14q and IGH rearrangements if there is a chr 14 translocation
+    # Omit +14q and IGH rearrangements if there is a chr 14 translocation and collapse duplicate clones
     reportID <- levels(as.factor(clones$ReportId))
     reports <- data.frame()
     i <- 1
@@ -83,12 +86,30 @@ parseKaryotype <- function(data, probes, unmathced = TRUE, karyotype = TRUE) {
     }
 
     # Remove duplicates
-    NAs <- reports[is.na(reports$Copy),]
-    reports <- na.omit(reports)
-    reports <- reports[(!duplicated(reports[,c("ReportId", "Clone", "Abnormality")])),]
+    if(deduplicate == TRUE) {
+        dedup.reports <- data.frame()
+        i <- 1
+        for(i in 1:length(unique(reports$ReportId))){
+            report <- reports[reports$ReportId == unique(reports$ReportId)[i],]
+            unique.clones <- data.frame()
+            j <- 1
+            for(j in 1:length(unique(report$Clone))){
+                unique.clone <- report[report$Clone == unique(report$Clone)[j], c("ReportId", "PatientMRN", "Source", "ObservationDate", "Clone", "Count", "Frequency", "Abnormality" )]
+                if(nrow(unique.clone) > 1 & all(unique.clone$Abnormality == "None")){
+                    unique.clone <- unique(unique.clone)
+                }
+                if(nrow(unique.clone) > 1 & any(unique.clone$Abnormality == "None")){
+                    unique.clone <- unique.clone[unique.clone$Abnormality != "None", ]
+                }
+                unique.clones <- rbind(unique.clone, unique.clones)
+            }
+            dedup.reports <- rbind(unique.clones, dedup.reports)
+        }
+        reports <- dedup.reports
+    }
 
     # Add unmatched reports
-    if(unmathced == TRUE){
+    if(unmatched == TRUE){
         unmatched.reports <- data[data$ReportId %in% setdiff(unique(data$ReportId), unique(reports$ReportId)), ]
         unmatched.reports$Clone <- ifelse(grepl(unmatched.reports$Karyotype, pattern = "nuc ish"), "Possible FISH detected, but pattern matching not possible", "FISH string not detected")
         reports <- merge(reports, unmatched.reports[,c("ReportId", "PatientMRN", "Source", "ObservationDate", "Clone")], all = TRUE)
@@ -96,12 +117,12 @@ parseKaryotype <- function(data, probes, unmathced = TRUE, karyotype = TRUE) {
 
     # Include original karyotype string
     if(karyotype == TRUE){
-        data.aggregate = aggregate(data = data, Karyotype~ReportId, FUN = function(x) paste(unique(x), collapse="; "))
+        data.aggregate <- aggregate(data = data, Karyotype~ReportId, FUN = function(x) paste(unique(x), collapse="; "))
         reports <- merge(reports, data.aggregate[,c("ReportId", "Karyotype")])
     }
 
-    # Sort by MRN and date
-    reports = reports[order(reports$PatientMRN, reports$ObservationDate), ]
+    # Sort by MRN, date, and clone
+    reports = reports[order(reports$PatientMRN, reports$ObservationDate, reports$Clone), ]
     rownames(reports) = NULL
     return(reports)
 }
