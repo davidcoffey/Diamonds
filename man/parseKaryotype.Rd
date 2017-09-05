@@ -4,7 +4,7 @@
 \alias{parseKaryotype}
 \title{Parse FISH karyotype strings}
 \usage{
-parseKaryotype(data, probes)
+parseKaryotype(data, probes, unmathced = TRUE, karyotype = TRUE)
 }
 \arguments{
 \item{data}{A data frame with columns named "PatientMRN", "ReportId",
@@ -12,6 +12,12 @@ parseKaryotype(data, probes)
 
 \item{probes}{A data frame with columns named "probe" and "chr" that defines
 the gene name and chromosomal location of the gene (e.g. 17p)}
+
+\item{karyotype}{A Boolean indicating if the original karyotype string should be included in the output.
+If TRUE, then the karyotype string is included.}
+
+\item{unmatched}{A Boolean indicating if unmatched reports should be included in the output.
+If TRUE, then reports for which no FISH strings are detected or pattern matching cannot be performed are included in the output.}
 }
 \value{
 Returns a data frame where each row represents a clone from the
@@ -19,4 +25,14 @@ FISH karyotype string.
 }
 \description{
 Parses FISH karyotype strings into individual clones.
+}
+\details{
+The five patterns below are recognized.  Pattern matching is case insensative.  Matched patterns are exluded if they do not contain a known probe.
+\describe{
+\item{pattern1}{(...)x#[...]}
+\item{pattern2}{(...)[...]}
+\item{pattern3}{(...)x#(...)[...]}
+\item{pattern4}{(...)(...)x#[...]}
+\item{pattern5}{(...)(...)[...]}
+}
 }
