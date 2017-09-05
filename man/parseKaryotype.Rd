@@ -20,3 +20,13 @@ FISH karyotype string.
 \description{
 Parses FISH karyotype strings into individual clones.
 }
+\details{
+The five patterns below are recognized.  Pattern matching is case insensative.  Matched patterns are exluded if they do not contain a known probe.
+\describe{
+\item{pattern1}{(...)x#[...]}
+\item{pattern2}{(...)[...]}
+\item{pattern3}{(...)x#(...)[...]}
+\item{pattern4}{(...)(...)x#[...]}
+\item{pattern5}{(...)(...)[...]}
+}
+}
