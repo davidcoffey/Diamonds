@@ -27,10 +27,10 @@
 #' @importFrom stringr str_extract_all str_extract
 #' @importFrom stats na.omit
 parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, deduplicate = TRUE) {
-    # Create regular expression pattern to matchstrings between parentheses
+    # Create regular expression pattern to match strings between brackets and parentheses
     pattern.clone <- "\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}\\]|\\([^()]+\\)\\[[^()]+]|\\([^()]+\\)x[[:digit:]]\\([^()]+\\)\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)\\[[^()]{1,9}]"
 
-    # Extract clones (FISH results between parentheses) using pattern and save as a list
+    # Extract clones using pattern and convert to a list
     clones.list <- stringr::str_extract_all(string = data$Karyotype, pattern = regex(pattern.clone, ignore_case = TRUE))
     names(clones.list) <- data$ReportId
 
@@ -73,7 +73,7 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
     }
     clones <- na.omit(clones)
 
-    # Omit +14q and IGH rearrangements if there is a chr 14 translocation and collapse duplicate clones
+    # Omit +14q and IGH rearrangements if there is a chr 14 translocation
     reportID <- levels(as.factor(clones$ReportId))
     reports <- data.frame()
     i <- 1
@@ -85,7 +85,7 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
         reports <- rbind(report, reports)
     }
 
-    # Remove duplicates
+    # Collapse duplicates
     if(deduplicate == TRUE) {
         dedup.reports <- data.frame()
         i <- 1
