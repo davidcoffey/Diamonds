@@ -5,7 +5,7 @@
 \title{Extract diagnoses}
 \usage{
 extractDiagnoses(connection, demographics = TRUE, diagnoses = NULL,
-  patients = NULL, format = "raw", n = Inf)
+  patients = NULL, format = "raw", n = -1)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
@@ -22,7 +22,7 @@ then set as NULL.}
 \item{format}{A character vector indicating the output format.  Options
 include "raw" or "byDiagnosis".}
 
-\item{n}{Number of records to retrieve.  Use n = Inf to retrieve all records.}
+\item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
 }
 \value{
 Returns a data frame with patient diagnoses from the Diamonds database.

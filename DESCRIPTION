@@ -5,7 +5,7 @@ Version: 0.1.5
 Author: David Coffey, MD
 Maintainer: David Coffey <dcoffey@fredhutch.org>
 Description: This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
-Imports: ggplot2, reshape, RColorBrewer, plotly, stringr, gtools, plyr, stats, odbc
+Imports: ggplot2, reshape, RColorBrewer, plotly, stringr, gtools, plyr, stats, odbc, DBI
 Depends: R (>= 3.3)
 License: Artistic-2.0
 Encoding: UTF-8

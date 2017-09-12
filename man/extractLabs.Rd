@@ -5,7 +5,7 @@
 \title{Extract labs}
 \usage{
 extractLabs(connection, demographics = TRUE, labs = NULL, patients = NULL,
-  format = "raw", n = Inf)
+  format = "raw", n = -1)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
@@ -25,7 +25,7 @@ limit is desired then set as NULL.}
 include "raw", "byObservationId", "byDaysFromFirstObservation", or
 "byObservationDate".}
 
-\item{n}{Number of records to retrieve.  Use n = Inf to retrieve all records.}
+\item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
 }
 \value{
 Returns a data frame with patient labs from the Diamonds database.
