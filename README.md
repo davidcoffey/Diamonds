@@ -1,5 +1,5 @@
-# Diamonds v0.1.6
-This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
+# Diamonds v0.2.0
+This R package provides an interface for extracting, filtering, and visualizing data in the Diamonds and Caisis clinical databases.
 
 ### Installation instructions for MacOS
 
@@ -81,16 +81,47 @@ library(odbc)
 odbc::odbcListDrivers()
 ```
 
-###### Connect to DNS server in R
-```
-library(DBI)
-channel <- DBI::dbConnect(odbc::odbc(), "CONGO-H", uid = "fhcrc\\username", pwd = rstudioapi::askForPassword("Database password"))
-```
-
 #### Download Diamonds package from GitHub in R
 ```
 install.packages("devtools")
 devtools::install_github("davidcoffey/Diamonds")
+```
+
+### Basic examples
+
+#### Open connection to DNS server in R
+```
+library(DBI)
+library(odbc)
+congo <- DBI::dbConnect(odbc::odbc(), "CONGO-H", uid = "fhcrc\\username", pwd = rstudioapi::askForPassword("Database password"))
+```
+
+#### Extracting data
+```
+observations = c("HCT", "WBC", "PLT", "INTRPE", "BJPTCA", "BJPT", "KFLC", "LFLC", "MC1QN", "MC2QN")
+labs = extractLabs(connection = congo, labs = observations, format = "raw")
+
+DxCodes = c("C90.00", "C90.01", "C90.03")
+diagnoses = extractDiagnoses(connection = congo, diagnoses = DxCodes, format = "raw")
+
+demographics = extractDemographics(connection = congo)
+status = extractDiseaseStatus(connection = congo)
+pathology = extractPathology(connection = congo)
+cytogenetics = extractCytogenetics(connection = congo)
+protocols = extractProtocols(connection = congo)
+radiology = extractRadiology(connection = congo)
+radiationTherapy = extractRadiationTherapy(connection = congo)
+medicalTherapy = extractMedicalTherapy(connection = congo)
+```
+
+#### Plot selected labs
+```
+plotLabs(data = labs, chart = "line", lab = "LFLC", interactive = TRUE)
+```
+
+#### Merge data tables
+```
+merged = Reduce(function(x, y) merge(x, y, all = FALSE), list(labs, status, diagnoses))
 ```
 
 ### Useful links

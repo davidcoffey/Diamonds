@@ -7,8 +7,8 @@
 parsePlasmacells(data)
 }
 \arguments{
-\item{data}{A data frame with columns named "PatientMRN", "ReportId",
-"PathNotes", and "ObservationDate".}
+\item{data}{A data frame with columns named "PatientMRN", "PathNum",
+"PathNotes", and "ProcDate".}
 }
 \value{
 Returns a data frame with extracted \% plasma cells from pathology reports

@@ -4,14 +4,11 @@
 \alias{extractLabs}
 \title{Extract labs}
 \usage{
-extractLabs(connection, demographics = TRUE, labs = NULL, patients = NULL,
-  format = "raw", n = -1)
+extractLabs(connection, labs = NULL, patients = NULL, format = "raw",
+  n = -1)
 }
 \arguments{
-\item{connection}{ODBC connection object returned by dbConnect.}
-
-\item{demographics}{Boolean value indicating whether demographic information
-should be included.}
+\item{connection}{ODBC connection object returned by dbGetQuery.}
 
 \item{labs}{A character vector of lab test identifiers. Refer to
 the University of Washington Lab Medicine website to search of test codes

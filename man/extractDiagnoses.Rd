@@ -4,14 +4,11 @@
 \alias{extractDiagnoses}
 \title{Extract diagnoses}
 \usage{
-extractDiagnoses(connection, demographics = TRUE, diagnoses = NULL,
-  patients = NULL, format = "raw", n = -1)
+extractDiagnoses(connection, diagnoses = NULL, patients = NULL,
+  format = "raw", n = -1)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
-
-\item{demographics}{Boolean value indicating whether demographic information
-should be included.}
 
 \item{diagnoses}{A character vector of ICD9 or ICD10 codes.  If no limit is desired
 then set as NULL.}
@@ -23,6 +20,9 @@ then set as NULL.}
 include "raw" or "byDiagnosis".}
 
 \item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
+
+\item{demographics}{Boolean value indicating whether demographic information
+should be included.}
 }
 \value{
 Returns a data frame with patient diagnoses from the Diamonds database.

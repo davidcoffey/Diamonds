@@ -2,8 +2,8 @@
 #'
 #' Parses pathology reports for \% plasma cells
 #'
-#' @param data A data frame with columns named "PatientMRN", "ReportId",
-#' "PathNotes", and "ObservationDate".
+#' @param data A data frame with columns named "PatientMRN", "PathNum",
+#' "PathNotes", and "ProcDate".
 #' @return Returns a data frame with extracted \% plasma cells from pathology reports
 #' @details
 #' \describe{
@@ -14,8 +14,9 @@
 #' @export
 #' @importFrom stringr str_extract_all str_extract str_replace_all
 parsePlasmacells <- function(data){
+    data <- data[!(is.na(data$PathNotes)), ]
     pathnotes <- str_replace_all(data$PathNotes, pattern = "[[:space:]]{1,5}", "")
-    plasmaCells <- data.frame("ReportId" = data$ReportId)
+    plasmaCells <- data.frame("PathNum" = data$PathNum)
     i <- 1
     for(i in 1:length(pathnotes)){
         pattern1 <- "\\d+\\.*\\d*%plasmacells[^:0-9]"
@@ -55,6 +56,6 @@ parsePlasmacells <- function(data){
             }
         }
     }
-    plasmaCells <- merge(data[,c("PatientMRN", "ReportId", "ObservationDate")], plasmaCells)
+    plasmaCells <- merge(data[,c("PatientMRN", "PathNum", "ProcDate")], plasmaCells)
     return(plasmaCells)
 }

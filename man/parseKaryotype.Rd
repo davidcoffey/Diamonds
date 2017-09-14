@@ -8,8 +8,8 @@ parseKaryotype(data, probes, unmatched = TRUE, karyotype = TRUE,
   deduplicate = TRUE)
 }
 \arguments{
-\item{data}{A data frame with columns named "PatientMRN", "ReportId",
-"Source", "ObservationDate", and "Karyotype".}
+\item{data}{A data frame with columns named "PatientMRN", "PathNum",
+"PathInstitution", "PathDate", and "PathKaryotype".}
 
 \item{probes}{A data frame with columns named "probe" and "chr" that defines
 the gene name and chromosomal location of the gene (e.g. 17p)}

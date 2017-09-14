@@ -2,9 +2,7 @@
 #'
 #' Extracts patient labs from the Diamonds database and returns a data frame.
 #'
-#' @param connection ODBC connection object returned by dbConnect.
-#' @param demographics Boolean value indicating whether demographic information
-#' should be included.
+#' @param connection ODBC connection object returned by dbGetQuery.
 #' @param labs A character vector of lab test identifiers. Refer to
 #' the University of Washington Lab Medicine website to search of test codes
 #' (\url{http://menu.labmed.washington.edu/oltg}).  If no limit is desired
@@ -19,8 +17,7 @@
 #' @export
 #' @importFrom reshape melt cast
 #' @import stringr DBI
-extractLabs <- function(connection, demographics = TRUE, labs = NULL,
-                            patients = NULL, format = "raw", n = -1) {
+extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(labs)){
         labs <- "LIKE '%'"
     } else {
@@ -32,74 +29,31 @@ extractLabs <- function(connection, demographics = TRUE, labs = NULL,
     } else {
         patients <- paste("IN ('", paste(patients, collapse = "', '"), "')", sep = "")
     }
-    if(demographics == TRUE){
-        data <- DBI::dbGetQuery(connection, paste("SELECT
-                                                   PatientMRN,
-                                                   Observation,
-                                                   ObservationId,
-                                                   ObservationDate,
-                                                   ObservationTime,
-                                                   DaysFromFirstObservation,
-                                                   ObservationValue,
-                                                   ObservationValueNumeric,
-                                                   Units,
-                                                   ReferencesRange,
-                                                   PatientDateOfBirth,
-                                                   PatientDeathDate,
-                                                   PatientDeathIndicator,
-                                                   PatientBirthPlace,
-                                                   PatientSex,
-                                                   PatientRace,
-                                                   PatientEthnicGroup,
-                                                   PatientCity,
-                                                   PatientState,
-                                                   PatientZipCode,
-                                                   PatientCountryCode,
-                                                   PatientLanguage,
-                                                   PatientMaritalStatus
-                                                   FROM FH_clinicalDW.Heme.vExam
-                                                   INNER JOIN FH_clinicalDW.Heme.vFactDiagnosticExam
-                                                   ON FH_clinicalDW.Heme.vExam.ExamKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ExamKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vPatient
-                                                   ON FH_clinicalDW.Heme.vFactDiagnosticExam.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vObservationDate
-                                                   ON FH_clinicalDW.Heme.vObservationDate.ObservationDateKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationDateKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vObservationTime
-                                                   ON FH_clinicalDW.Heme.vObservationTime.ObservationTimeKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationTimeKey
-                                                   WHERE FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationId ", labs, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
-        data$PatientMRN <- as.factor(data$PatientMRN)
-        data$ObservationTime <- gsub(pattern = ":00.0000000", data$ObservationTime, replacement = "")
-        data$ObservationDate <- as.Date(data$ObservationDate, format = "%Y-%m-%d")
-        data$PatientDateOfBirth <- as.Date(data$PatientDateOfBirth, format = "%Y-%m-%d")
-        data$PatientDeathDate <- as.Date(data$PatientDeathDate, format = "%Y-%m-%d")
-        data <- data[order(data$PatientMRN, data$ObservationDate),]
-    }else{
-        data <- DBI::dbGetQuery(connection, paste("SELECT
-                                                   PatientMRN,
-                                                   Observation,
-                                                   ObservationId,
-                                                   ObservationDate,
-                                                   ObservationTime,
-                                                   DaysFromFirstObservation,
-                                                   ObservationValue,
-                                                   ObservationValueNumeric,
-                                                   Units,
-                                                   ReferencesRange
-                                                   FROM FH_clinicalDW.Heme.vExam
-                                                   INNER JOIN FH_clinicalDW.Heme.vFactDiagnosticExam
-                                                   ON FH_clinicalDW.Heme.vExam.ExamKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ExamKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vPatient
-                                                   ON FH_clinicalDW.Heme.vFactDiagnosticExam.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vObservationDate
-                                                   ON FH_clinicalDW.Heme.vObservationDate.ObservationDateKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationDateKey
-                                                   INNER JOIN FH_clinicalDW.Heme.vObservationTime
-                                                   ON FH_clinicalDW.Heme.vObservationTime.ObservationTimeKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationTimeKey
-                                                   WHERE FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationId ", labs, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
-        data$PatientMRN <- as.factor(data$PatientMRN)
-        data$ObservationTime <- gsub(pattern = ":00.0000000", data$ObservationTime, replacement = "")
-        data$ObservationDate <- as.Date(data$ObservationDate, format = "%Y-%m-%d")
-        data <- data[order(data$PatientMRN, data$ObservationDate),]
-    }
+    data <- DBI::dbGetQuery(connection, paste("SELECT
+                                               PatientMRN,
+                                               Observation,
+                                               ObservationId,
+                                               ObservationDate,
+                                               ObservationTime,
+                                               DaysFromFirstObservation,
+                                               ObservationValue,
+                                               ObservationValueNumeric,
+                                               Units,
+                                               ReferencesRange
+                                               FROM FH_clinicalDW.Heme.vExam
+                                               INNER JOIN FH_clinicalDW.Heme.vFactDiagnosticExam
+                                               ON FH_clinicalDW.Heme.vExam.ExamKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ExamKey
+                                               INNER JOIN FH_clinicalDW.Heme.vPatient
+                                               ON FH_clinicalDW.Heme.vFactDiagnosticExam.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
+                                               INNER JOIN FH_clinicalDW.Heme.vObservationDate
+                                               ON FH_clinicalDW.Heme.vObservationDate.ObservationDateKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationDateKey
+                                               INNER JOIN FH_clinicalDW.Heme.vObservationTime
+                                               ON FH_clinicalDW.Heme.vObservationTime.ObservationTimeKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationTimeKey
+                                               WHERE FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationId ", labs, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
+    data$PatientMRN <- as.factor(data$PatientMRN)
+    data$ObservationTime <- gsub(pattern = ":00.0000000", data$ObservationTime, replacement = "")
+    data$ObservationDate <- as.Date(data$ObservationDate, format = "%Y-%m-%d")
+    data <- data[order(data$PatientMRN, data$ObservationDate),]
 
     data$ObservationValueNumeric <- ifelse(grepl(pattern = "too small|no spike|polyclonal|normal|oligoclonal|no bence jones|not detectable|not seen", data$ObservationValue, ignore.case = TRUE), 0,
                                           ifelse(grepl(pattern ="g/d|g/24|grams per 24 hours", data$ObservationValue, ignore.case = TRUE),

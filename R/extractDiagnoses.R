@@ -16,8 +16,7 @@
 #' @export
 #' @importFrom reshape melt cast
 #' @import stringr DBI
-extractDiagnoses <- function(connection, demographics = TRUE, diagnoses = NULL,
-                        patients = NULL, format = "raw", n = -1) {
+extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(diagnoses)){
         diagnoses <- "LIKE '%'"
     } else {
@@ -29,56 +28,22 @@ extractDiagnoses <- function(connection, demographics = TRUE, diagnoses = NULL,
     } else {
         patients <- paste("IN ('", paste(patients, collapse = "', '"), "')", sep = "")
     }
-    if(demographics == TRUE){
-        data <- DBI::dbGetQuery(connection, paste("SELECT DISTINCT
-                                                    PatientMRN,
-                                                    DxCodingMethod,
-                                                    DxCode,
-                                                    DxDescription,
-                                                    CCSLevel1Name,
-                                                    CCSLevel2Name,
-                                                    CCSLevel3Name,
-                                                    PatientDateOfBirth,
-                                                    PatientDeathDate,
-                                                    PatientDeathIndicator,
-                                                    PatientBirthPlace,
-                                                    PatientSex,
-                                                    PatientRace,
-                                                    PatientEthnicGroup,
-                                                    PatientCity,
-                                                    PatientState,
-                                                    PatientZipCode,
-                                                    PatientCountryCode,
-                                                    PatientLanguage,
-                                                    PatientMaritalStatus
-                                                    FROM FH_clinicalDW.Heme.vDiagnosis
-                                                    INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
-                                                    ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
-                                                    INNER JOIN FH_clinicalDW.Heme.vPatient
-                                                    ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
-                                                    WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
-        data$PatientMRN = as.factor(data$PatientMRN)
-        data$PatientDateOfBirth = as.Date(data$PatientDateOfBirth, format = "%Y-%m-%d")
-        data$PatientDeathDate = as.Date(data$PatientDeathDate, format = "%Y-%m-%d")
-        data = data[order(data$PatientMRN, data$DxCode),]
-    }else{
-        data <- DBI::dbGetQuery(connection, paste("SELECT DISTINCT
-                                                    PatientMRN,
-                                                    DxCodingMethod,
-                                                    DxCode,
-                                                    DxDescription,
-                                                    CCSLevel1Name,
-                                                    CCSLevel2Name,
-                                                    CCSLevel3Name
-                                                    FROM FH_clinicalDW.Heme.vDiagnosis
-                                                    INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
-                                                    ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
-                                                    INNER JOIN FH_clinicalDW.Heme.vPatient
-                                                    ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
-                                                    WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
-        data$PatientMRN = as.factor(data$PatientMRN)
-        data = data[order(data$PatientMRN, data$DxCode),]
-    }
+    data <- DBI::dbGetQuery(connection, paste("SELECT DISTINCT
+                                               PatientMRN,
+                                               DxCodingMethod,
+                                               DxCode,
+                                               DxDescription,
+                                               CCSLevel1Name,
+                                               CCSLevel2Name,
+                                               CCSLevel3Name
+                                               FROM FH_clinicalDW.Heme.vDiagnosis
+                                               INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
+                                               ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
+                                               INNER JOIN FH_clinicalDW.Heme.vPatient
+                                               ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
+                                               WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
+    data$PatientMRN = as.factor(data$PatientMRN)
+    data = data[order(data$PatientMRN, data$DxCode),]
     if(format == "raw") {
         return(data)
     }

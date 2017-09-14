@@ -2,8 +2,8 @@
 #'
 #' Parses FISH karyotype strings into individual clones.
 #'
-#' @param data A data frame with columns named "PatientMRN", "ReportId",
-#' "Source", "ObservationDate", and "Karyotype".
+#' @param data A data frame with columns named "PatientMRN", "PathNum",
+#' "PathInstitution", "PathDate", and "PathKaryotype".
 #' @param probes A data frame with columns named "probe" and "chr" that defines
 #' the gene name and chromosomal location of the gene (e.g. 17p)
 #' @param unmatched A Boolean indicating if unmatched reports should be included in the output.
@@ -27,12 +27,16 @@
 #' @importFrom stringr str_extract_all str_extract
 #' @importFrom stats na.omit
 parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, deduplicate = TRUE) {
+    data <- data[!(is.na(data$PathKaryotype)),]
+    if(nrow(data) == 0) {
+        stop("No FISH strings found.", call. = FALSE)
+    }
     # Create regular expression pattern to match strings between brackets and parentheses
     pattern.clone <- "\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}\\]|\\([^()]+\\)\\[[^()]+]|\\([^()]+\\)x[[:digit:]]\\([^()]+\\)\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)x[[:digit:]]\\[[^()]{1,9}]|\\([^()]+\\)\\([^()]+\\)\\[[^()]{1,9}]"
 
     # Extract clones using pattern and convert to a list
-    clones.list <- stringr::str_extract_all(string = data$Karyotype, pattern = regex(pattern.clone, ignore_case = TRUE))
-    names(clones.list) <- data$ReportId
+    clones.list <- stringr::str_extract_all(string = data$PathKaryotype, pattern = regex(pattern.clone, ignore_case = TRUE))
+    names(clones.list) <- data$PathNum
 
     # Extract probe specific clones
     clones <- data.frame()
@@ -40,7 +44,7 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
     for(i in 1:nrow(probes)){
         # Seperate clones into rows
         clone <- plyr::ldply(lapply(clones.list, function(x) grep(x, pattern = probes$probe[i], value = TRUE)), cbind)
-        names(clone) <- c("ReportId", "Clone")
+        names(clone) <- c("PathNum", "Clone")
         clone$Gene <- rep(probes$probe[i], nrow(clone))
 
         # Parse copy number and clonal frequency
@@ -67,18 +71,18 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
                                                                 ifelse(grepl(clone$Clone, pattern = "sep", ignore.case = TRUE) & grepl(clone$Clone, pattern = "MYC"), "MYC rearrangement", clone$Abnormality))))))
 
         # Merge all clones with metadata
-        metadata <- unique(data[,c("PatientMRN", "ReportId", "Source", "ObservationDate")])
+        metadata <- unique(data[,c("PatientMRN", "PathNum", "PathInstitution", "PathDate")])
         clone <- merge(metadata, clone, all = FALSE)
         clones <- rbind(clones, clone)
     }
     clones <- na.omit(clones)
 
     # Omit +14q and IGH rearrangements if there is a chr 14 translocation
-    reportID <- levels(as.factor(clones$ReportId))
+    reportID <- levels(as.factor(clones$PathNum))
     reports <- data.frame()
     i <- 1
     for(i in 1:length(reportID)){
-        report <- clones[clones$ReportId == reportID[i], ]
+        report <- clones[clones$PathNum == reportID[i], ]
         report$Abnormality <- ifelse(grepl(report$Abnormality, pattern = "14q32.3\\+|IGH rearrangement") & any(grepl(report$Abnormality, pattern = "t\\(")), "None", report$Abnormality)
 
         # Merge all reports
@@ -89,12 +93,12 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
     if(deduplicate == TRUE) {
         dedup.reports <- data.frame()
         i <- 1
-        for(i in 1:length(unique(reports$ReportId))){
-            report <- reports[reports$ReportId == unique(reports$ReportId)[i],]
+        for(i in 1:length(unique(reports$PathNum))){
+            report <- reports[reports$PathNum == unique(reports$PathNum)[i],]
             unique.clones <- data.frame()
             j <- 1
             for(j in 1:length(unique(report$Clone))){
-                unique.clone <- report[report$Clone == unique(report$Clone)[j], c("ReportId", "PatientMRN", "Source", "ObservationDate", "Clone", "Count", "Frequency", "Abnormality" )]
+                unique.clone <- report[report$Clone == unique(report$Clone)[j], c("PathNum", "PatientMRN", "PathInstitution", "PathDate", "Clone", "Count", "Frequency", "Abnormality" )]
                 if(nrow(unique.clone) > 1 & all(unique.clone$Abnormality == "None")){
                     unique.clone <- unique(unique.clone)
                 }
@@ -110,19 +114,19 @@ parseKaryotype <- function(data, probes, unmatched = TRUE, karyotype = TRUE, ded
 
     # Add unmatched reports
     if(unmatched == TRUE){
-        unmatched.reports <- data[data$ReportId %in% setdiff(unique(data$ReportId), unique(reports$ReportId)), ]
-        unmatched.reports$Clone <- ifelse(grepl(unmatched.reports$Karyotype, pattern = "nuc ish"), "Possible FISH detected, but pattern matching not possible", "FISH string not detected")
-        reports <- merge(reports, unmatched.reports[,c("ReportId", "PatientMRN", "Source", "ObservationDate", "Clone")], all = TRUE)
+        unmatched.reports <- data[data$PathNum %in% setdiff(unique(data$PathNum), unique(reports$PathNum)), ]
+        unmatched.reports$Clone <- ifelse(grepl(unmatched.reports$PathKaryotype, pattern = "nuc ish"), "Possible FISH detected, but pattern matching not possible", "FISH string not detected")
+        reports <- merge(reports, unmatched.reports[,c("PathNum", "PatientMRN", "PathInstitution", "PathDate", "Clone")], all = TRUE)
     }
 
     # Include original karyotype string
     if(karyotype == TRUE){
-        data.aggregate <- aggregate(data = data, Karyotype~ReportId, FUN = function(x) paste(unique(x), collapse="; "))
-        reports <- merge(reports, data.aggregate[,c("ReportId", "Karyotype")])
+        data.aggregate <- aggregate(data = data, PathKaryotype~PathNum, FUN = function(x) paste(unique(x), collapse="; "))
+        reports <- merge(reports, data.aggregate[,c("PathNum", "PathKaryotype")])
     }
 
     # Sort by MRN, date, and clone
-    reports = reports[order(reports$PatientMRN, reports$ObservationDate, reports$Clone), ]
+    reports = reports[order(reports$PatientMRN, reports$PathDate, reports$Clone), ]
     rownames(reports) = NULL
     return(reports)
 }
