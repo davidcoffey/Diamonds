@@ -4,7 +4,7 @@
 \alias{extractDemographics}
 \title{Extract demographics}
 \usage{
-extractDemographics(connection, patients = NULL, format = "raw", n = -1)
+extractDemographics(connection, patients = NULL, n = -1)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
@@ -16,6 +16,8 @@ limit is desired then set as NULL.}
 }
 \value{
 Returns a data frame with patient demographics from the Diamonds database.
+PatientAge and PatientAgeGroup are added columns calculated from today's date.
+RacialGroup column is also added which aggregates similar races into a single group.
 }
 \description{
 Extracts patient demographics from the Diamonds database and returns a data frame.

@@ -20,9 +20,6 @@ then set as NULL.}
 include "raw" or "byDiagnosis".}
 
 \item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
-
-\item{demographics}{Boolean value indicating whether demographic information
-should be included.}
 }
 \value{
 Returns a data frame with patient diagnoses from the Diamonds database.
