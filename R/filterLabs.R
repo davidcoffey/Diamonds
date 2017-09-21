@@ -81,7 +81,7 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         }
     }
     if(format == "raw") {
-        return(filtered.all)
+        return(droplevels(filtered.all))
     }
     if(format == "byObservationId") {
         melt <- reshape::melt(filtered.all, id = c("PatientMRN", "ObservationDate", "ObservationId"),

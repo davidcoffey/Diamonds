@@ -20,3 +20,8 @@ Returns a data frame with pathology reports from the Caisis database.
 \description{
 Extracts pathology reports from the Caisis database and returns a data frame.
 }
+\details{
+For columns reporting the precentatage of plasma cells, a new column
+is created with the numeric value only.  Less or greater than symbols are
+removed and the median is reported for ranges.  N/As are converted to 0.
+}

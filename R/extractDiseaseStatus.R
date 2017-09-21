@@ -16,15 +16,19 @@ extractDiseaseStatus <- function(connection, patients = NULL, n = -1) {
         patients <- paste("IN ('", paste(patients, collapse = "', '"), "')", sep = "")
     }
     data <- DBI::dbGetQuery(connection, paste("SELECT
-                                               PtMRN as 'PatientMRN',
-                                               StatusDisease,
-                                               StatusDate,
-                                               Status,
-                                               PtDeathDate as 'PatientDeathDate',
-                                               PtDeathType
-                                               FROM CaisisProd.dbo.vDatasetPatients
-                                               INNER JOIN CaisisProd.dbo.vDatasetStatus ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetStatus.PatientId
-                                               WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
+                                                CaisisProd.dbo.vDatasetPatients.PtMRN as 'PatientMRN',
+                                                CaisisProd.dbo.vDatasetStatus.StatusDisease,
+                                                CaisisProd.dbo.vDatasetStatus.StatusDate,
+                                                CaisisProd.dbo.vDatasetStatus.Status,
+                                                CaisisProd.dbo.vDatasetPatients.PtDeathDate as 'PatientDeathDate',
+                                                CaisisProd.dbo.vDatasetPatients.PtDeathType,
+                                                CaisisProd.dbo.vDatasetClinicalStages.ClinStageDate,
+                                                CaisisProd.dbo.vDatasetClinicalStages.ClinStageSystem,
+                                                CaisisProd.dbo.vDatasetClinicalStages.ClinStageS
+                                                FROM CaisisProd.dbo.vDatasetPatients
+                                                INNER JOIN CaisisProd.dbo.vDatasetStatus ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetStatus.PatientId
+                                                INNER JOIN CaisisProd.dbo.vDatasetClinicalStages ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetClinicalStages.PatientId
+                                                WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$PatientDeathDate = as.Date(data$PatientDeathDate, format = "%Y-%m-%d")
 return(data)

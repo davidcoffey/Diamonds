@@ -3,8 +3,6 @@
 #' Extracts patient diagnoses from the Diamonds database and returns a data frame.
 #'
 #' @param connection ODBC connection object returned by dbConnect.
-#' @param demographics Boolean value indicating whether demographic information
-#' should be included.
 #' @param diagnoses A character vector of ICD9 or ICD10 codes.  If no limit is desired
 #' then set as NULL.
 #' @param patients A character vector of patient medical record numbers.  If no limit is desired
