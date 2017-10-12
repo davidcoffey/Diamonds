@@ -19,6 +19,7 @@ extractCytogenetics <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetPatients.PtMRN as 'PatientMRN',
                                               CaisisProd.dbo.vDatasetPathology.PathInstitution,
                                               CaisisProd.dbo.vDatasetPathTest.PathDate,
+                                              CaisisProd.dbo.vDatasetProcedures.ProcDate,
                                               CaisisProd.dbo.vDatasetPathology.PathNum,
                                               CaisisProd.dbo.vDatasetPathTest.PathMethod,
                                               CaisisProd.dbo.vDatasetPathTest.PathTest,
@@ -27,8 +28,9 @@ extractCytogenetics <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetPathTest.PathKaryotype,
                                               CaisisProd.dbo.vDatasetMyelomaPath.PathCytogeneticsAbnormalResults
                                               FROM CaisisProd.dbo.vDatasetPatients
-                                              INNER JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
-                                              FULL JOIN CaisisProd.dbo.vDatasetPathTest ON CaisisProd.dbo.vDatasetPathology.PathologyId = CaisisProd.dbo.vDatasetPathTest.PathologyId
+                                              FULL JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
+                                              INNER JOIN CaisisProd.dbo.vDatasetPathTest ON CaisisProd.dbo.vDatasetPathology.PathologyId = CaisisProd.dbo.vDatasetPathTest.PathologyId
+                                              FULL JOIN CaisisProd.dbo.vDatasetProcedures ON CaisisProd.dbo.vDatasetPathology.ProcedureId = CaisisProd.dbo.vDatasetProcedures.ProcedureId
                                               FULL JOIN CaisisProd.dbo.vDatasetMyelomaPath ON CaisisProd.dbo.vDatasetMyelomaPath.PathologyId = CaisisProd.dbo.vDatasetPathology.PathologyId
                                               WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
