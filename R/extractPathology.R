@@ -43,7 +43,8 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometrySpecimenType,
                                               CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometryLightchainrestriction,
                                               CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometryAbnormalPlasmaCells,
-                                              CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometryNormalPlasmaCells
+                                              CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometryNormalPlasmaCells,
+                                              CaisisProd.dbo.vDatasetMyelomaPath.EnteredTime
                                               FROM CaisisProd.dbo.vDatasetPatients
                                               INNER JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
                                               INNER JOIN CaisisProd.dbo.vDatasetProcedures ON CaisisProd.dbo.vDatasetPathology.ProcedureId = CaisisProd.dbo.vDatasetProcedures.ProcedureId
@@ -52,6 +53,7 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
     data$PatientMRN <- as.factor(data$PatientMRN)
     data$PathDate <- as.Date(data$PathDate, format = "%Y-%m-%d")
     data$ProcDate <- as.Date(data$ProcDate, format = "%Y-%m-%d")
+    data$EnteredTime <- as.Date(data$EnteredTime, format = "%Y-%m-%d")
 
     columns <- c("PathBMAPlasmacells", "PathFlowCytometryAbnormalPlasmaCells", "PathFlowCytometryNormalPlasmaCells")
     i <- 1

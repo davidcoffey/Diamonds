@@ -26,7 +26,8 @@ extractCytogenetics <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetPathTest.PathResult,
                                               CaisisProd.dbo.vDatasetPathTest.PathNotes,
                                               CaisisProd.dbo.vDatasetPathTest.PathKaryotype,
-                                              CaisisProd.dbo.vDatasetMyelomaPath.PathCytogeneticsAbnormalResults
+                                              CaisisProd.dbo.vDatasetMyelomaPath.PathCytogeneticsAbnormalResults,
+                                              CaisisProd.dbo.vDatasetPathTest.EnteredTime
                                               FROM CaisisProd.dbo.vDatasetPatients
                                               FULL JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
                                               INNER JOIN CaisisProd.dbo.vDatasetPathTest ON CaisisProd.dbo.vDatasetPathology.PathologyId = CaisisProd.dbo.vDatasetPathTest.PathologyId
@@ -35,5 +36,7 @@ extractCytogenetics <- function(connection, patients = NULL, n = -1) {
                                               WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$PathDate = as.Date(data$PathDate, format = "%Y-%m-%d")
+    data$ProcDate = as.Date(data$ProcDate, format = "%Y-%m-%d")
+    data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
     return(data)
 }
