@@ -20,12 +20,14 @@ extractEncounters <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetEncounters.EncType,
                                               CaisisProd.dbo.vDatasetEncounters.EncDate,
                                               CaisisProd.dbo.vDatasetEncounters.EncPhysician,
-                                              CaisisProd.dbo.vDatasetEncounters.EncECOG_Score
+                                              CaisisProd.dbo.vDatasetEncounters.EncECOG_Score,
+                                              CaisisProd.dbo.vDatasetEncounters.EnteredTime
                                               FROM CaisisProd.dbo.vDatasetEncounters
                                               INNER JOIN CaisisProd.dbo.vDatasetPatients
                                               ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetEncounters.PatientId
                                               WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$EncDate = as.Date(data$EncDate, format = "%Y-%m-%d")
+    data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
     return(data)
 }

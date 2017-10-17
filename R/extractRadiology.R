@@ -45,12 +45,14 @@ extractRadiology <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetDxImageMyeloma.ImgNumofLucentLesions,
                                               CaisisProd.dbo.vDatasetDxImageMyeloma.ImgSiteofLyticLesions,
                                               CaisisProd.dbo.vDatasetDxImageMyeloma.ImgSiteofLucentLesions,
-                                              CaisisProd.dbo.vDatasetDxImageMyeloma.ImgSiteofFractures
+                                              CaisisProd.dbo.vDatasetDxImageMyeloma.ImgSiteofFractures,
+                                              CaisisProd.dbo.vDatasetDxImageMyeloma.EnteredTime
                                               FROM CaisisProd.dbo.vDatasetPatients
                                               INNER JOIN CaisisProd.dbo.vDatasetDiagnostics ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetDiagnostics.PatientId
                                               FULL JOIN CaisisProd.dbo.vDatasetDxImageMyeloma ON CaisisProd.dbo.vDatasetDxImageMyeloma.DiagnosticId = CaisisProd.dbo.vDatasetDiagnostics.DiagnosticId
                                               WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$DxDate = as.Date(data$DxDate, format = "%Y-%m-%d")
+    data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
     return(data)
 }

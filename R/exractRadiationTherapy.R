@@ -21,12 +21,14 @@ extractRadiationTherapy <- function(connection, patients = NULL, n = -1) {
                                                CaisisProd.dbo.vDatasetRadiationTherapy.RadTxDate,
                                                CaisisProd.dbo.vDatasetRadiationTherapy.RadTxStopDate,
                                                CaisisProd.dbo.vDatasetRadiationTherapy.RadTxTarget,
-                                               CaisisProd.dbo.vDatasetRadiationTherapy.RadTxTotalDose
+                                               CaisisProd.dbo.vDatasetRadiationTherapy.RadTxTotalDose,
+                                               CaisisProd.dbo.vDatasetRadiationTherapy.EnteredTime
                                                FROM CaisisProd.dbo.vDatasetPatients
                                                INNER JOIN CaisisProd.dbo.vDatasetRadiationTherapy ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetRadiationTherapy.PatientId
                                                WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$RadTxDate = as.Date(data$RadTxDate, format = "%Y-%m-%d")
     data$RadTxStopDate = as.Date(data$RadTxStopDate, format = "%Y-%m-%d")
+    data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
     return(data)
 }

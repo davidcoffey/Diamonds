@@ -21,12 +21,17 @@ extractMedicalTherapy <- function(connection, patients = NULL, n = -1) {
                                                CaisisProd.dbo.vDatasetMedicalTherapy.MedTxType,
                                                CaisisProd.dbo.vDatasetMedicalTherapy.MedTxAgent,
                                                CaisisProd.dbo.vDatasetMedicalTherapy.MedTxCycle,
-                                               CaisisProd.dbo.vDatasetMedicalTherapy.MedTxStopDate
+                                               CaisisProd.dbo.vDatasetMedicalTherapy.MedTxStopDate,
+                                               CaisisProd.dbo.vDatasetMedicalTherapy.MedTxConditioning,
+                                               CaisisProd.dbo.vDatasetMedicalTherapy.MedTxDonor,
+                                               CaisisProd.dbo.vDatasetMedicalTherapy.MedTxTransplantType,
+                                               CaisisProd.dbo.vDatasetMedicalTherapy.EnteredTime
                                                FROM CaisisProd.dbo.vDatasetPatients
                                                INNER JOIN CaisisProd.dbo.vDatasetMedicalTherapy ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetMedicalTherapy.PatientId
                                                WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$MedTxDate = as.Date(data$MedTxDate, format = "%Y-%m-%d")
     data$MedTxStopDate = as.Date(data$MedTxStopDate, format = "%Y-%m-%d")
+    data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
     return(data)
 }
