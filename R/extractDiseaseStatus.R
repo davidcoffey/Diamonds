@@ -28,12 +28,13 @@ extractDiseaseStatus <- function(connection, patients = NULL, n = -1) {
                                                 CaisisProd.dbo.vDatasetStatus.EnteredTime
                                                 FROM CaisisProd.dbo.vDatasetPatients
                                                 INNER JOIN CaisisProd.dbo.vDatasetStatus ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetStatus.PatientId
-                                                INNER JOIN CaisisProd.dbo.vDatasetClinicalStages ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetClinicalStages.PatientId
+                                                FULL JOIN CaisisProd.dbo.vDatasetClinicalStages ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetClinicalStages.PatientId
                                                 WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
     data$PatientMRN = as.factor(data$PatientMRN)
     data$StatusDate = as.Date(data$StatusDate, format = "%Y-%m-%d")
     data$ClinStageDate = as.Date(data$ClinStageDate, format = "%Y-%m-%d")
     data$PatientDeathDate = as.Date(data$PatientDeathDate, format = "%Y-%m-%d")
+    data$PatientDeathIndicator = ifelse(!is.na(data$PatientDeathDate), "Dead", "Unknown")
     data$EnteredTime = as.Date(data$EnteredTime, format = "%Y-%m-%d")
 return(data)
 }
