@@ -68,7 +68,7 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
 
         # Calculate median value for ranges
         data[,columnNumeric] <- ifelse(grepl(data[,columnNumeric], pattern = "-"),
-                                   as.numeric(lapply(stringr::str_split(grep(data[,columnNumeric], pattern = "-", value = TRUE), "-"), function(x) stats::median(as.numeric(x)))),
+                                   as.numeric(lapply(stringr::str_split(data[,columnNumeric], "-"), function(x) stats::median(as.numeric(x)))),
                                    data[,columnNumeric])
         data[,columnNumeric] <- as.numeric(data[,columnNumeric])
     }
