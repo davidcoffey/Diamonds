@@ -41,6 +41,7 @@ nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini
 	ServerName = CONGO-H
 	Instance = H
 ```
+
 ###### Add the following configuration settings to your odbcinst.ini file (**the version number in the paths may be different for your installation**)
 ```
 nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbcinst.ini
