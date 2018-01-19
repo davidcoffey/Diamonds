@@ -20,7 +20,11 @@ brew install unixodbc
 brew install freetds --with-unixodbc
 ```
 
+<<<<<<< HEAD
 ###### Add the following configuration settings to your freetds.conf file (**the version number in the path may be different for your installation**)
+=======
+###### Use a text editor like nano to edit the freetds.conf configuration file (the version number 1.00.80, may be different for your installation)
+>>>>>>> 1b1a36e8b56d001d486fc3f02c741a41a5515f98
 ```
 nano /usr/local/Cellar/freetds/1.00.80/etc/freetds.conf
 
@@ -31,7 +35,11 @@ nano /usr/local/Cellar/freetds/1.00.80/etc/freetds.conf
 	tds version = 7.0
 ```
 
+<<<<<<< HEAD
 ###### Add the following configuration settings to your odbc.ini file (**the version number in the path may be different for your installation**)	
+=======
+###### Use a text editor like nano to edit the odbc.ini file (the version number 2.3.5_1, may be different for your installation)	
+>>>>>>> 1b1a36e8b56d001d486fc3f02c741a41a5515f98
 ```
 nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini
 
@@ -41,7 +49,11 @@ nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini
 	ServerName = CONGO-H
 	Instance = H
 ```
+<<<<<<< HEAD
 ###### Add the following configuration settings to your odbcinst.ini file (**the version number in the paths may be different for your installation**)
+=======
+###### Use a text editor like nano to edit the odbcinst.ini file (the version numbers may be different for your installation)
+>>>>>>> 1b1a36e8b56d001d486fc3f02c741a41a5515f98
 ```
 nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbcinst.ini
 
@@ -64,7 +76,11 @@ ln -sF /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini ~/.odbc.ini
 ln -sF /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbcinst.ini ~/.odbcinst.ini
 ```
 
+<<<<<<< HEAD
 ###### Add an envronmental variable to your Rprofile pointing to the directory with the odbc.ini and odbcinst.ini files (**repeat this step every time R is updated**)
+=======
+###### Use a text editor like nano to edit your Rprofile file (**this will need to be repeated every time R is updated**)
+>>>>>>> 1b1a36e8b56d001d486fc3f02c741a41a5515f98
 ```
 nano /Library/Frameworks/R.framework/Versions/Current/Resources/library/base/R/Rprofile
 
