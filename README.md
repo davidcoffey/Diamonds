@@ -9,65 +9,66 @@ This R package provides an interface for extracting, filtering, and visualizing 
 ```
 /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
+
 ###### Install unixodbc using brew
 ```
 brew install unixodbc
 ```
+
 ###### Install freetds using using brew making sure to specify that it has to be used with unixodbc
 ```
 brew install freetds --with-unixodbc
 ```
 
-###### Use a text editor like nano to edit the freetds.conf configuration file
+###### Add the following configuration settings to your freetds.conf file (**the version number in the path may be different for your installation**)
 ```
-nano /usr/local/Cellar/freetds/1.00.9/etc/freetds.conf
+nano /usr/local/Cellar/freetds/1.00.80/etc/freetds.conf
 
-	[CONGO-H]
-		host = 140.107.116.197
-		instance = H
-		port = 51000
-		tds version = 7.0
-```
-
-###### Use a text editor like nano to edit the odbc.ini file	
-```
-nano /usr/local/Cellar/unixodbc/2.3.4/etc/odbc.ini
-
-	[CONGO-H]
-		DRIVER = FreeTDS
-		Description = ODBC INI FILE
-		ServerName = CONGO-H
-		Instance = H
-```
-###### Use a text editor like nano to edit the odbcinst.ini file
-```
-nano /usr/local/Cellar/unixodbc/2.3.4/etc/odbcinst.ini
-
-	[FreeTDS]
-		Description = FreeTDS
-		Driver = /usr/local/Cellar/freetds/1.00.9/lib/libtdsodbc.so
-		Setup= /usr/local/Cellar/freetds/1.00.9/lib/libtdsodbc.so
-		UsageCount = 1
+[CONGO-H]
+	host = 140.107.116.197
+	instance = H
+	port = 51000
+	tds version = 7.0
 ```
 
-###### Test DNS connection
+###### Add the following configuration settings to your odbc.ini file (**the version number in the path may be different for your installation**)	
+```
+nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini
+
+[CONGO-H]
+	DRIVER = FreeTDS
+	Description = ODBC INI FILE
+	ServerName = CONGO-H
+	Instance = H
+```
+###### Add the following configuration settings to your odbcinst.ini file (**the version number in the paths may be different for your installation**)
+```
+nano /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbcinst.ini
+
+[FreeTDS]
+	Description = FreeTDS
+	Driver = /usr/local/Cellar/freetds/1.00.80/lib/libtdsodbc.so
+	Setup = /usr/local/Cellar/freetds/1.00.80/lib/libtdsodbc.so
+	UsageCount = 1
+```
+
+###### Test the DNS connection in the command line
 ```
 tsql -S CONGO-H -U 'fhcrc\username'
 ```
 
 ###### Create symbolic links to the above edited files to your home directory
 ```
-ln -sF /usr/local/Cellar/freetds/1.00.9/etc/freetds.conf ~/.freetds.conf
-ln -sF /usr/local/Cellar/unixodbc/2.3.4/etc/odbc.ini ~/.odbc.ini
-ln -sF /usr/local/Cellar/unixodbc/2.3.4/etc/odbcinst.ini ~/.odbcinst.ini
+ln -sF /usr/local/Cellar/freetds/1.00.80/etc/freetds.conf ~/.freetds.conf
+ln -sF /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbc.ini ~/.odbc.ini
+ln -sF /usr/local/Cellar/unixodbc/2.3.5_1/etc/odbcinst.ini ~/.odbcinst.ini
 ```
 
-###### Use a text editor like nano to edit your Rprofile file (**this and the following step will need to be repeated every time R is updated**)
+###### Add an envronmental variable to your Rprofile pointing to the directory with the odbc.ini and odbcinst.ini files (**repeat this step every time R is updated**)
 ```
-nano /Library/Frameworks/R.framework/Versions/3.4/Resources/library/base/R/Rprofile
+nano /Library/Frameworks/R.framework/Versions/Current/Resources/library/base/R/Rprofile
 
-	Sys.setenv(ODBC_INCLUDE="/usr/local/include")
-	Sys.setenv(ODBC_LIBS="/usr/local/lib")
+Sys.setenv(ODBCSYSINI="/usr/local/Cellar/unixodbc/2.3.5_1/etc/")
 ```
 
 ###### Install odbc in R
@@ -75,7 +76,7 @@ nano /Library/Frameworks/R.framework/Versions/3.4/Resources/library/base/R/Rprof
 install.packages("odbc")
 ```
 
-###### Test DNS setup in R
+###### Test DNS setup in R (if you do not see your driver listed, then something went wrong)
 ```
 library(odbc)
 odbc::odbcListDrivers()
@@ -93,6 +94,7 @@ devtools::install_github("davidcoffey/Diamonds")
 ```
 library(DBI)
 library(odbc)
+library(Diamonds)
 congo <- DBI::dbConnect(odbc::odbc(), "CONGO-H", uid = "fhcrc\\username", pwd = rstudioapi::askForPassword("Database password"))
 ```
 
