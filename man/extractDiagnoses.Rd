@@ -22,7 +22,8 @@ include "raw" or "byDiagnosis".}
 \item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
 }
 \value{
-Returns a data frame with patient diagnoses from the Diamonds database.
+Returns a data frame with patient diagnoses and the date they were assigned in
+the Diamonds database.
 }
 \description{
 Extracts patient diagnoses from the Diamonds database and returns a data frame.
