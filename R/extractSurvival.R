@@ -36,7 +36,7 @@ extractSurvival <- function(connection, patients = NULL, CaisisDiagnosis = "Mult
     DiamondsDeathStatus <- demographics[,c("PatientMRN", "PatientDateOfBirth", "PatientDeathIndicator", "PatientDeathDate")]
     names(DiamondsDeathStatus)[3:4] <- c("DiamondsDeathStatus", "DiamondsDeathDate")
 
-    status.patients <- paste("IN ('", paste(status$PatientMRN, collapse = "', '"), "')", sep = "")
+    status.patients <- paste("IN ('", paste(patients, collapse = "', '"), "')", sep = "")
     LastLabDate <- DBI::dbGetQuery(connection, paste("SELECT
                                                       PatientMRN,
                                                       MAX(ObservationDate) AS 'LastLabDate'
