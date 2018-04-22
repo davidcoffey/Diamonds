@@ -1,7 +1,7 @@
 Package: Diamonds
 Type: Package
 Title: For clinical data mining of the Diamonds database
-Version: 0.3.0
+Version: 0.3.1
 Author: David Coffey, MD
 Maintainer: David Coffey <dcoffey@fredhutch.org>
 Description: This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
