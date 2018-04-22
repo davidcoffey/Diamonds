@@ -4,7 +4,8 @@
 \alias{extractMedicalTherapy}
 \title{Extract medical therapy}
 \usage{
-extractMedicalTherapy(connection, patients = NULL, n = -1)
+extractMedicalTherapy(connection, patients = NULL, n = -1,
+  duration = FALSE)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
@@ -13,6 +14,11 @@ extractMedicalTherapy(connection, patients = NULL, n = -1)
 limit is desired then set as NULL.}
 
 \item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
+
+\item{duration}{A boolean indicating if the duration per line of therapy should
+be computed.  A line of therapy is defined as drugs initiated within 14 days of each
+other.  The duration is defined as the time in days between two lines of therapy.
+If TRUE, then line and duraiton columns are added to the output.}
 }
 \value{
 Returns a data frame with medical therapy from the Caisis database.
