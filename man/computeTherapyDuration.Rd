@@ -4,11 +4,9 @@
 \alias{computeTherapyDuration}
 \title{Compute duration per line of therapy}
 \usage{
-computeTherapyDuration(connection, medicalTherapy)
+computeTherapyDuration(medicalTherapy)
 }
 \arguments{
-\item{connection}{ODBC connection object returned by dbConnect.}
-
 \item{medicalTherapy}{A data frame of medical therapy from the Caisis database.}
 }
 \value{

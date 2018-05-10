@@ -2,7 +2,6 @@
 #'
 #' Adds duration per line of therapy to medical therapy extracted from the Caisis database.
 #'
-#' @param connection ODBC connection object returned by dbConnect.
 #' @param medicalTherapy A data frame of medical therapy from the Caisis database.
 #' @return Returns a data frame with medical therapy from the Caisis database with
 #' the addition of line and duration of therapy.  A line of therapy is defined as drugs
@@ -10,7 +9,7 @@
 #' days between two lines of therapy.
 #' @export
 #' @import DBI
-computeTherapyDuration <- function(connection, medicalTherapy) {
+computeTherapyDuration <- function(medicalTherapy) {
     # Sort therapy by patient then by start day
     medicalTherapy <- medicalTherapy[order(medicalTherapy$PatientMRN, medicalTherapy$MedTxDate, decreasing = FALSE), ]
 

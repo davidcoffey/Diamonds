@@ -1,4 +1,4 @@
-# Diamonds v0.3.1
+# Diamonds v0.3.2
 This R package provides an interface for extracting, filtering, and visualizing data in the Diamonds and Caisis clinical databases.
 
 ### Installation instructions for MacOS
