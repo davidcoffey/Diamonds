@@ -7,7 +7,7 @@
 #' @return Returns a data frame with the first and last date along with
 #' the time between, number, and mean number of days between dates.
 #' @export
-#' @import dplyr
+#' @importFrom dplyr summarize group_by
 computeInterval = function(data, dateColumn = "ObservationDate"){
     group <- dplyr::group_by(unique(data[,c("PatientMRN", dateColumn)]), PatientMRN)
     names(group)[2] <- "dateColumn"
