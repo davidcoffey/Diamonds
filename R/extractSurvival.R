@@ -51,8 +51,8 @@ extractSurvival <- function(connection, patients = NULL, CaisisDiagnosis = "Mult
     survival <- unique(Reduce(function(x, y) merge(x, y, all=TRUE), list(DiamondsDiagnosisDate, CaisisDiagnosisDate, AliveDate, DiamondsDeathStatus, CaisisDeathStatus, LastLabDate)))
     survival$EarliestDiagnosisDate <- pmin(survival$CaisisDiagnosisDate, survival$DiamondsDiagnosisDate, na.rm = TRUE)
     survival$LastDate <- pmax(survival$LastLabDate, survival$CaisisLastAliveDate, survival$CaisisDeathDate, survival$DiamondsDeathDate, na.rm = TRUE)
-    survival$Status <- ifelse(survival$DiamondsDeathStatus == "Dead" | survival$CaisisDeathStatus == "Dead", "Dead",
-                              ifelse((Sys.Date() - survival$LastLabDate) < 180 | (Sys.Date() - survival$CaisisLastAliveDate) < 180, "Alive", "Unknown"))
+    survival$Status <- ifelse((survival$DiamondsDeathStatus == "Dead" & !(is.na(survival$DiamondsDeathStatus))) | (survival$CaisisDeathStatus == "Dead" & !(is.na(survival$CaisisDeathStatus))), "Dead",
+                              ifelse((Sys.Date() - survival$LastLabDate) < 180 | ((Sys.Date() - survival$CaisisLastAliveDate) < 180 & !(is.na(survival$CaisisLastAliveDate))), "Alive", "Unknown"))
     survival$SurvivalMonths <- round((survival$LastDate - survival$EarliestDiagnosisDate)/30, digits = 2)
     return(survival)
 }
