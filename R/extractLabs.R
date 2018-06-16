@@ -38,6 +38,7 @@ extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw"
                                                DaysFromFirstObservation,
                                                ObservationValue,
                                                ObservationValueNumeric,
+                                               AbnormalFlags,
                                                Units,
                                                ReferencesRange
                                                FROM FH_clinicalDW.Heme.vExam
@@ -54,14 +55,20 @@ extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw"
     data$ObservationTime <- gsub(pattern = ":00.0000000", data$ObservationTime, replacement = "")
     data$ObservationDate <- as.Date(data$ObservationDate, format = "%Y-%m-%d")
     data <- data[order(data$PatientMRN, data$ObservationDate),]
-
     data$ObservationValueNumeric <- ifelse(grepl(pattern = "too small|no spike|polyclonal|normal|oligoclonal|no bence jones|not detectable|not seen", data$ObservationValue, ignore.case = TRUE), 0,
-                                          ifelse(grepl(pattern ="g/d|g/24|grams per 24 hours", data$ObservationValue, ignore.case = TRUE),
-                                                as.numeric(gsub(pattern = "[[:space:]]|[[:alpha:]]|/|=|24", replacement = "", stringr::str_match(stringr::str_to_lower(data$ObservationValue), ".....g/d|.....g/24|.....grams per 24 hours"))),
-                                           ifelse(grepl(pattern ="pg/mL|ng/mL", data$ObservationValue, ignore.case = TRUE),
-                                                 as.numeric(gsub(pattern = "[[:space:]]|[[:alpha:]]|/|:|(|)", replacement = "", stringr::str_match(stringr::str_to_lower(data$ObservationValue), ":......"))),
-                                            as.numeric(data$ObservationValueNumeric))))
-
+                                           ifelse(grepl(pattern ="g/d|g/24|grams per 24 hours", data$ObservationValue, ignore.case = TRUE),
+                                                  gsub(pattern = "[[:space:]]|[[:alpha:]]|/|=|24", replacement = "", stringr::str_match(stringr::str_to_lower(data$ObservationValue), ".....g/d|.....g/24|.....grams per 24 hours")),
+                                                  ifelse(grepl(pattern ="pg/mL|ng/mL", data$ObservationValue, ignore.case = TRUE),
+                                                         gsub(pattern = "[[:space:]]|[[:alpha:]]|/|:|(|)", replacement = "", stringr::str_match(stringr::str_to_lower(data$ObservationValue), ":......")),
+                                                         data$ObservationValueNumeric)))
+    data$ObservationValueNumeric <- suppressWarnings(as.numeric(data$ObservationValueNumeric))
+    if(any(grepl(pattern = "-", data$ReferencesRange))){
+        data$ReferencesRange <- ifelse(data$ReferencesRange == "", NA, data$ReferencesRange)
+        ReferencesRange <- data.frame(do.call(rbind, strsplit(data$ReferencesRange, '-')))
+        ReferencesRange <- suppressWarnings(data.frame(apply(ReferencesRange, 2, function(x) as.numeric(x))))
+        names(ReferencesRange) <- c("LowerLimit", "UpperLimit")
+        data <- cbind(data, ReferencesRange)
+    }
     if(format == "raw") {
         return(data)
     }

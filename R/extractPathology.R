@@ -61,7 +61,7 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
         # Remove symbols
         columnNumeric <- paste(columns[i], "Numeric", sep = "")
         data[,columnNumeric] <- data[,columns[i]]
-        data[,columnNumeric] <- gsub(data[,columnNumeric], pattern = "%|<|>", replacement = "")
+        data[,columnNumeric] <- gsub(data[,columnNumeric], pattern = "%|<|>|~", replacement = "")
 
         # Convert N/A to 0
         data[,columnNumeric] <- ifelse(grepl(data[,columnNumeric], pattern = "N|A|O", ignore.case = TRUE), 0, data[,columnNumeric])
