@@ -1,5 +1,55 @@
-# Diamonds v0.3.4
-This R package provides an interface for extracting, filtering, and visualizing data in the Diamonds and Caisis clinical databases.
+# Nexus v0.4.0
+Nexus is a user friendly, open-source software package written in the R programming language that provides a seamless integration of Caisis and Diamonds clinical databases at the Fred Hutch.  It is intended for data scientists to reduce the effort required to prepare data for statistical and exploratory analyses.  It requires credentials which can be obtained for investigators of IRB approved protocols.
+
+### Features of Nexus
+* Seamlessly integrate Caisis and Diamonds databases
+* Import data tables directly into R environment without having to perform a separate SQL query
+* Clean fields with mixed numeric and categorical data types (e.g 2 g/dl becomes 2.0)
+* Corrects misspellings and inconsistencies in drug names (e.g. Asprin becomes Aspirin)
+* Estimate overall survival from the time of diagnosis to death or last encounter
+* Estimate treatment response from the duration between therapies
+* Parse complex karyotype into a structured data table
+* Parse percent plasma cells from pathology text reports
+* Add drug class and mechanism of action
+* Quickly filter laboratory data using a separate date range for each patient (useful for tracking patients enrolled in a clinical trial)
+* Reformat laboratory data tables with laboratory value or date as column or row
+* Plot any laboratory value across any cohort of patients using a consistent time scale
+* Perform de-identification and create optional key linking medical record numbers to randomly assigned patient IDs
+* Compute number of encounters or observations across first and last time point within any data table
+* Compute Charleston Comorbidity Index from ICD codes
+* Ability to export data tables into Excel
+
+### Nexus imports the follow data tabes in to R
+
+#### Caisis database
+* Disease status
+* Encounters
+* Bone marrow biosy and flow cytometry reports
+* FISH and cytogenetics reports
+* Medical therapy history
+* Radiation therapy history
+* Radiology reports
+
+#### Diamonds database
+* Fred Hutch protocol consents
+* Laboratory data
+* ICD codes
+
+#### Computed tables
+* Overall survival
+* Duration of between treatments and line of therapy
+* Duration and number of encounters between any time points per patient
+* Parsed karyotype strings
+* Parsed percentage of plasma cells
+
+#### Additional tables coming soon
+* Vital signs
+* Gateway and NW Biotrust consents
+* PIRO protocols
+* Laboratory orders
+* Diagnoses
+* Appointments
+* Freezer Pro specimens
 
 ### Installation instructions for MacOS
 
