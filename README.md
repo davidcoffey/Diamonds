@@ -4,20 +4,15 @@ Nexus is a user friendly, open-source software package written in the R programm
 ### Features of Nexus
 * Seamlessly integrate Caisis and Diamonds databases
 * Import data tables directly into R environment without having to perform a separate SQL query
-* Clean fields with mixed numeric and categorical data types (e.g 2 g/dl becomes 2.0)
-* Corrects misspellings and inconsistencies in drug names (e.g. Asprin becomes Aspirin)
+* Clean fields with mixed numeric and categorical data types
 * Estimate overall survival from the time of diagnosis to death or last encounter
 * Estimate treatment response from the duration between therapies
 * Parse complex karyotype into a structured data table
 * Parse percent plasma cells from pathology text reports
-* Add drug class and mechanism of action
-* Quickly filter laboratory data using a separate date range for each patient (useful for tracking patients enrolled in a clinical trial)
+* Quickly filter laboratory data using a separate date range for each patient
 * Reformat laboratory data tables with laboratory value or date as column or row
 * Plot any laboratory value across any cohort of patients using a consistent time scale
-* Perform de-identification and create optional key linking medical record numbers to randomly assigned patient IDs
 * Compute number of encounters or observations across first and last time point within any data table
-* Compute Charleston Comorbidity Index from ICD codes
-* Ability to export data tables into Excel
 
 ### Nexus imports the follow data tabes in to R
 
