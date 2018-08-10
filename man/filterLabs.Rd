@@ -6,7 +6,7 @@
 \usage{
 filterLabs(data, patients, ids = NULL, dates, timepoints = NULL,
   groups = NULL, range = "on", within = NULL, format = "raw",
-  na.rm = FALSE)
+  na.rm = FALSE, multiple = NULL)
 }
 \arguments{
 \item{data}{A data frame extracted from the Diamonds database in "raw" format.}
@@ -45,6 +45,12 @@ include "raw", "byObservationId", "byDaysFromFirstTimePoint",
 
 \item{na.rm}{A Boolean indicating whether rows with NA valules should be
 removed.}
+
+\item{multiple}{An optional character vector for how to handle multiple lab
+results available for the same patient.  If "closet", then the lab result
+closet to the timepoint is given.  If "furthest", the the lab result
+furthest to the timepoint is given.  If NULL, then all test results
+that satisfiy the filter criteria are given.}
 }
 \value{
 Returns a data frame with patient observations from the Diamonds

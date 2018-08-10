@@ -24,6 +24,11 @@
 #' before and after each time point to filter.  For example, c(-14, 14) would
 #' indicate that all dates less than or greater than 14 days of the specified
 #' time point are to be filtered.
+#' @param multiple An optional character vector for how to handle multiple lab
+#' results available for the same patient.  If "closet", then the lab result
+#' closet to the timepoint is given.  If "furthest", the the lab result
+#' furthest to the timepoint is given.  If NULL, then all test results
+#' that satisfiy the filter criteria are given.
 #' @param format A character vector indicating the output format.  Options
 #' include "raw", "byObservationId", "byDaysFromFirstTimePoint",
 #' "byObservationDate", or "byTimePoint".
@@ -38,7 +43,7 @@
 #' @importFrom stats na.omit
 filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                            groups = NULL, range = "on", within = NULL,
-                           format = "raw", na.rm = FALSE) {
+                           format = "raw", na.rm = FALSE, multiple = NULL) {
     if(!length(patients) == length(dates)){stop("The length of patients and dates are not the same", call. = FALSE)}
     filtered.all <- data.frame()
     i = 1
@@ -61,6 +66,12 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                                 (data$ObservationDate <= date + max(within)),]
         }
         filtered$DaysFromFirstTimePoint <- as.integer(filtered$ObservationDate - min(as.Date(dates[which(patients == patient)])))
+        if(multiple == "closest"){
+            filtered = filtered[which.min(filtered$DaysFromFirstTimePoint),]
+        }
+        if(multiple == "furthest"){
+            filtered = filtered[which.min(filtered$DaysFromFirstTimePoint),]
+        }
         if(na.rm == TRUE){
             #filtered = filtered[!is.na(filtered$ObservationValueNumeric), ]
             filtered = na.omit(filtered)
