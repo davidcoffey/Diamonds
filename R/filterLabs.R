@@ -66,17 +66,21 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
                                 (data$ObservationDate <= date + max(within)),]
         }
         filtered$DaysFromFirstTimePoint <- as.integer(filtered$ObservationDate - min(as.Date(dates[which(patients == patient)])))
-        if(multiple == "closest"){
-            filtered = filtered[which.min(filtered$DaysFromFirstTimePoint),]
-        }
-        if(multiple == "furthest"){
-            filtered = filtered[which.min(filtered$DaysFromFirstTimePoint),]
-        }
         if(na.rm == TRUE){
             #filtered = filtered[!is.na(filtered$ObservationValueNumeric), ]
             filtered = na.omit(filtered)
         }
         if(nrow(filtered) != 0){
+            if(!is.null(multiple)){
+                if(multiple == "closest"){
+                    filtered.min = aggregate(data = filtered, DaysFromFirstTimePoint~PatientMRN+ObservationId, min)
+                    filtered = merge(filtered, filtered.min)
+                }
+                if(multiple == "furthest"){
+                    filtered.max = aggregate(data = filtered, DaysFromFirstTimePoint~PatientMRN+ObservationId, max)
+                    filtered = merge(filtered, filtered.max)
+                }
+            }
             if(!is.null(ids)){
                 filtered$PatientId <- as.character(ids)[i]
             }

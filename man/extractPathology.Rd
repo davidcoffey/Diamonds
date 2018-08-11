@@ -4,13 +4,17 @@
 \alias{extractPathology}
 \title{Extract pathology reports}
 \usage{
-extractPathology(connection, patients = NULL, n = -1)
+extractPathology(connection, patients = NULL, parsePlasmacells = FALSE,
+  n = -1)
 }
 \arguments{
 \item{connection}{ODBC connection object returned by dbConnect.}
 
 \item{patients}{A character vector of patient medical record numbers.  If no
 limit is desired then set as NULL.}
+
+\item{parsePlasmacells}{A Boolean indicating whether unabstracted plasma cell
+precentrages should be abstracted from PathNotes column.}
 
 \item{n}{Number of records to retrieve.  Use n = -1 to retrieve all records.}
 }

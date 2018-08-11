@@ -6,13 +6,15 @@
 #' @param patients A character vector of patient medical record numbers.  If no
 #' limit is desired then set as NULL.
 #' @param n Number of records to retrieve.  Use n = -1 to retrieve all records.
+#' @param parsePlasmacells A Boolean indicating whether unabstracted plasma cell
+#' precentrages should be abstracted from PathNotes column.
 #' @return Returns a data frame with pathology reports from the Caisis database.
 #' @details For columns reporting the precentatage of plasma cells, a new column
 #' is created with the numeric value only.  Less or greater than symbols are
 #' removed and the median is reported for ranges.  N/As are converted to 0.
 #' @export
 #' @import DBI stats stringr
-extractPathology <- function(connection, patients = NULL, n = -1) {
+extractPathology <- function(connection, patients = NULL, parsePlasmacells = FALSE, n = -1) {
     if(is.null(patients)){
         patients <- "LIKE '%'"
     } else {
@@ -46,10 +48,12 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
                                               CaisisProd.dbo.vDatasetMyelomaPath.PathFlowCytometryNormalPlasmaCells,
                                               CaisisProd.dbo.vDatasetMyelomaPath.EnteredTime
                                               FROM CaisisProd.dbo.vDatasetPatients
-                                              INNER JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
-                                              INNER JOIN CaisisProd.dbo.vDatasetProcedures ON CaisisProd.dbo.vDatasetPathology.ProcedureId = CaisisProd.dbo.vDatasetProcedures.ProcedureId
+                                              FULL JOIN CaisisProd.dbo.vDatasetPathology ON CaisisProd.dbo.vDatasetPatients.PatientId = CaisisProd.dbo.vDatasetPathology.PatientId
+                                              FULL JOIN CaisisProd.dbo.vDatasetProcedures ON CaisisProd.dbo.vDatasetPathology.ProcedureId = CaisisProd.dbo.vDatasetProcedures.ProcedureId
                                               FULL JOIN CaisisProd.dbo.vDatasetMyelomaPath ON CaisisProd.dbo.vDatasetMyelomaPath.PathologyId = CaisisProd.dbo.vDatasetPathology.PathologyId
-                                              WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n=-1)
+                                              WHERE CaisisProd.dbo.vDatasetPatients.PtMRN ", patients, sep = ""), n)
+    un.abstracted <- data[is.na(data$EnteredTime),]
+    data <- data[!is.na(data$EnteredTime),]
     data$PatientMRN <- as.factor(data$PatientMRN)
     data$PathDate <- as.Date(data$PathDate, format = "%Y-%m-%d")
     data$ProcDate <- as.Date(data$ProcDate, format = "%Y-%m-%d")
@@ -61,16 +65,32 @@ extractPathology <- function(connection, patients = NULL, n = -1) {
         # Remove symbols
         columnNumeric <- paste(columns[i], "Numeric", sep = "")
         data[,columnNumeric] <- data[,columns[i]]
-        data[,columnNumeric] <- gsub(data[,columnNumeric], pattern = "%|<|>|~", replacement = "")
+        data[,columnNumeric] <- gsub(data[,columnNumeric], pattern = "%|<|>|~|:", replacement = "")
 
         # Convert N/A to 0
         data[,columnNumeric] <- ifelse(grepl(data[,columnNumeric], pattern = "N|A|O", ignore.case = TRUE), 0, data[,columnNumeric])
+        data[,columnNumeric] <- ifelse(is.na(data[,columnNumeric]), 0, data[,columnNumeric])
+
+        # Turn bilateral measurments into range
+        data[,columnNumeric] = gsub(data[,columnNumeric], pattern = " Left| Right", replacement = "-")
+        data[,columnNumeric] = gsub(data[,columnNumeric], pattern = "Left|Right", replacement = "")
 
         # Calculate median value for ranges
         data[,columnNumeric] <- ifelse(grepl(data[,columnNumeric], pattern = "-"),
-                                   as.numeric(lapply(stringr::str_split(data[,columnNumeric], "-"), function(x) stats::median(as.numeric(x)))),
-                                   data[,columnNumeric])
+                                       as.numeric(lapply(stringr::str_split(data[,columnNumeric], "-"), function(x) stats::median(as.numeric(x)))),
+                                       data[,columnNumeric])
         data[,columnNumeric] <- as.numeric(data[,columnNumeric])
+    }
+
+    if(parsePlasmacells == TRUE){
+        #un.abstracted$PathBMAPlasmacellsNumeric <- unlist(lapply(list(un.abstracted$PathNotes), FUN = parsePlasmacells))
+        parsedPlasmaCells <- suppressWarnings(parsePlasmacellsDataFrame(un.abstracted))
+        parsedPlasmaCells <- parsedPlasmaCells[parsedPlasmaCells$boneMarrow == TRUE & !is.na(parsedPlasmaCells$PlasmaCell),]
+        names(parsedPlasmaCells)[7] <- "PathBMAPlasmacellsNumeric"
+        parsedPlasmaCells$Abstraction <- rep("Parsed", nrow(parsedPlasmaCells))
+        un.abstracted <- merge(un.abstracted, parsedPlasmaCells[,c("PathNum", "PatientMRN", "ProcDate", "PathBMAPlasmacellsNumeric", "Abstraction")], all = TRUE)
+        data <- merge(data, un.abstracted, all = TRUE)
+        data$Abstraction <- ifelse(is.na(data$Abstraction), "Manual", data$Abstraction)
     }
     return(data)
 }
