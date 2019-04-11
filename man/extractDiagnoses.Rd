@@ -11,7 +11,7 @@ extractDiagnoses(connection, diagnoses = NULL, patients = NULL,
 \item{connection}{ODBC connection object returned by dbConnect.}
 
 \item{diagnoses}{A character vector of ICD9 or ICD10 codes.  If no limit is desired
-then set as NULL.}
+then set as NULL. May use \% or _ for partial matches.}
 
 \item{patients}{A character vector of patient medical record numbers.  If no limit is desired
 then set as NULL.}

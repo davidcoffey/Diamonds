@@ -4,8 +4,8 @@
 \alias{plotLabs}
 \title{Plot labs}
 \usage{
-plotLabs(data, lab, chart, id = FALSE, timepoint = FALSE, groups = FALSE,
-  interactive = FALSE)
+plotLabs(data, lab, chart, id = FALSE, timepoint = FALSE,
+  groups = FALSE, interactive = FALSE)
 }
 \arguments{
 \item{data}{A data frame extracted from Diamonds in the `raw`` format.}

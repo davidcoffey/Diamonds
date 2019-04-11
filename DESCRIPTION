@@ -1,7 +1,7 @@
 Package: Nexus
 Type: Package
 Title: For clinical data mining of the Caisis and Diamonds databases
-Version: 0.4.1
+Version: 0.4.2
 Author: David Coffey, MD
 Maintainer: David Coffey <dcoffey@fredhutch.org>
 Description: This R package is designed to make extracting, manipulating, and visualizing data from the Diamonds database easier.
@@ -10,4 +10,4 @@ Depends: R (>= 3.3)
 License: Artistic-2.0
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0

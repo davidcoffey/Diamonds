@@ -1,4 +1,4 @@
-#' Filter labs
+#' Filter
 #'
 #' Filters and renames extracted Diamonds data by specified time points.
 #'
@@ -32,6 +32,11 @@
 #' @param format A character vector indicating the output format.  Options
 #' include "raw", "byObservationId", "byDaysFromFirstTimePoint",
 #' "byObservationDate", or "byTimePoint".
+#' @param observation.column A character vector indicating the name of the column
+#' corresponding to the observation.
+#' @param date.column A character vector indicating the name of the column
+#' corresponding to the observation date.
+#' @param value.column A character vector indicating the value of the observation.
 #' @param na.rm A Boolean indicating whether rows with NA valules should be
 #' removed.
 #' @return Returns a data frame with patient observations from the Diamonds
@@ -41,9 +46,10 @@
 #' @export
 #' @importFrom reshape melt cast
 #' @importFrom stats na.omit
-filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
-                           groups = NULL, range = "on", within = NULL,
-                           format = "raw", na.rm = FALSE, multiple = NULL) {
+filter <- function(data, patients, ids = NULL, dates, timepoints = NULL,
+                   groups = NULL, range = "on", within = NULL,
+                   format = "raw", na.rm = FALSE, multiple = NULL, date.column = "ObservationDate",
+                   observation.column = "ObservationId", value.column = "ObservationValueNumeric") {
     if(!length(patients) == length(dates)){stop("The length of patients and dates are not the same", call. = FALSE)}
     filtered.all <- data.frame()
     i = 1
@@ -51,33 +57,32 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         patient <- as.character(patients)[i]
         date <- as.Date(dates)[i]
         if(range == "on"){
-            filtered = data[data$PatientMRN == patient & data$ObservationDate == date,]
+            filtered = data[data$PatientMRN == patient & data[,date.column] == date,]
         }
         if(range == "after"){
-            filtered = data[data$PatientMRN == patient & data$ObservationDate >= date,]
+            filtered = data[data$PatientMRN == patient & data[,date.column] >= date,]
         }
         if(range == "before"){
-            filtered = data[data$PatientMRN == patient & data$ObservationDate <= date,]
+            filtered = data[data$PatientMRN == patient & data[,date.column] <= date,]
         }
         if(range == "within"){
             if(is.null(within)){stop("Please specify a day range using the 'within' parameter", call. = FALSE)}
             filtered = data[data$PatientMRN == patient &
-                                (data$ObservationDate >= date + min(within)) &
-                                (data$ObservationDate <= date + max(within)),]
+                                (data[,date.column] >= date + min(within)) &
+                                (data[,date.column] <= date + max(within)),]
         }
-        filtered$DaysFromFirstTimePoint <- as.integer(filtered$ObservationDate - min(as.Date(dates[which(patients == patient)])))
+        filtered$DaysFromFirstTimePoint <- as.integer(filtered[,date.column] - min(as.Date(dates[which(patients == patient)])))
         if(na.rm == TRUE){
-            #filtered = filtered[!is.na(filtered$ObservationValueNumeric), ]
             filtered = na.omit(filtered)
         }
         if(nrow(filtered) != 0){
             if(!is.null(multiple)){
                 if(multiple == "closest"){
-                    filtered.min = aggregate(data = filtered, DaysFromFirstTimePoint~PatientMRN+ObservationId, min)
+                    filtered.min = aggregate(data = filtered, as.formula(paste("DaysFromFirstTimePoint~PatientMRN+", observation.column)), min)
                     filtered = merge(filtered, filtered.min)
                 }
                 if(multiple == "furthest"){
-                    filtered.max = aggregate(data = filtered, DaysFromFirstTimePoint~PatientMRN+ObservationId, max)
+                    filtered.max = aggregate(data = filtered, as.formula(paste("DaysFromFirstTimePoint~PatientMRN+", observation.column)), max)
                     filtered = merge(filtered, filtered.max)
                 }
             }
@@ -99,9 +104,9 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         return(droplevels(filtered.all))
     }
     if(format == "byObservationId") {
-        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "ObservationDate", "ObservationId"),
-                     measure.vars = c("ObservationValueNumeric"))
-        cast <- reshape::cast(melt, PatientMRN + ObservationDate ~ ObservationId, mean, fill ="")
+        melt <- reshape::melt(filtered.all, id = c("PatientMRN", date.column, observation.column),
+                     measure.vars = value.column)
+        cast <- reshape::cast(melt, as.formula(paste("PatientMRN +", date.column, "~ ObservationId")), mean, fill ="")
         if(!is.null(groups)){
             cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
@@ -111,9 +116,9 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         return(cast)
     }
     if(format == "byDaysFromFirstTimePoint") {
-        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "DaysFromFirstTimePoint", "ObservationId"),
-                     measure.vars = c("ObservationValueNumeric"))
-        cast <- reshape::cast(melt, PatientMRN + ObservationId ~ DaysFromFirstTimePoint, mean, fill = "")
+        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "DaysFromFirstTimePoint", observation.column),
+                     measure.vars = value.column)
+        cast <- reshape::cast(melt, as.formula(paste("PatientMRN + ", observation.column, "~ DaysFromFirstTimePoint")), mean, fill = "")
         if(!is.null(groups)){
             cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
@@ -123,9 +128,9 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         return(cast)
     }
     if(format == "byObservationDate") {
-        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "ObservationDate", "ObservationId"),
-                     measure.vars = c("ObservationValueNumeric"))
-        cast <- reshape::cast(melt, PatientMRN + ObservationId ~ ObservationDate, mean, fill = "")
+        melt <- reshape::melt(filtered.all, id = c("PatientMRN", date.column, observation.column),
+                     measure.vars = value.column)
+        cast <- reshape::cast(melt, as.formula(paste("PatientMRN + ObservationId ~", date.column)), mean, fill = "")
         if(!is.null(groups)){
             cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }
@@ -135,9 +140,9 @@ filterLabs <- function(data, patients, ids = NULL, dates, timepoints = NULL,
         return(cast)
     }
     if(format == "byTimePoint") {
-        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "TimePoint", "ObservationId"),
-                              measure.vars = c("ObservationValueNumeric"))
-        cast <- reshape::cast(melt, PatientMRN + ObservationId ~ TimePoint, mean, fill = "")
+        melt <- reshape::melt(filtered.all, id = c("PatientMRN", "TimePoint", observation.column),
+                              measure.vars = value.column)
+        cast <- reshape::cast(melt, as.formula(paste("PatientMRN + ", observation.column, "~ TimePoint")), mean, fill = "")
         if(!is.null(groups)){
             cast <- merge(unique(data.frame(PatientMRN = patients, Groups = groups)), cast)
         }

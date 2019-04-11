@@ -4,7 +4,7 @@
 #'
 #' @param connection ODBC connection object returned by dbConnect.
 #' @param diagnoses A character vector of ICD9 or ICD10 codes.  If no limit is desired
-#' then set as NULL.
+#' then set as NULL. May use \% or _ for partial matches.
 #' @param patients A character vector of patient medical record numbers.  If no limit is desired
 #' then set as NULL.
 #' @param format A character vector indicating the output format.  Options
@@ -19,7 +19,7 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
     if(is.null(diagnoses)){
         diagnoses <- "LIKE '%'"
     } else {
-        diagnoses <- paste("IN ('", paste(diagnoses, collapse = "', '"), "')", sep = "")
+        diagnoses <- paste("'", paste(diagnoses, collapse = "' OR FH_clinicalDW.Heme.vDiagnosis.DxCode LIKE '"), "'", sep = "")
     }
 
     if(is.null(patients)){
@@ -43,7 +43,7 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
                                                ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
                                                INNER JOIN FH_clinicalDW.Heme.vContactDate
                                                ON FH_clinicalDW.Heme.vFactFacilityBilling.ContactDateKey = FH_clinicalDW.Heme.vContactDate.ContactDateKey
-                                               WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
+                                               WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode LIKE ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
     data$PatientMRN <- as.factor(data$PatientMRN)
     data$ContactDate <- as.Date(data$ContactDate, format = "%Y-%m-%d")
     data = data[order(data$PatientMRN, data$DxCode),]
