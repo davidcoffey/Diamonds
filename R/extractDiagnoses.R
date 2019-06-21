@@ -14,12 +14,12 @@
 #' the Diamonds database.
 #' @export
 #' @importFrom reshape melt cast
-#' @import stringr DBI
+#' @import stringr DBI dplyr
 extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(diagnoses)){
-        diagnoses <- "LIKE '%'"
+        diagnoses <- "'%'"
     } else {
-        diagnoses <- paste("'", paste(diagnoses, collapse = "' OR FH_clinicalDW.Heme.vDiagnosis.DxCode LIKE '"), "'", sep = "")
+        diagnoses <- paste("IN ('", paste(diagnoses, collapse = "', '"), "')", sep = "")
     }
 
     if(is.null(patients)){
@@ -35,7 +35,7 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
                                                CCSLevel1Name,
                                                CCSLevel2Name,
                                                CCSLevel3Name,
-                                               ContactDate
+                                               ContactDateDesc
                                                FROM FH_clinicalDW.Heme.vDiagnosis
                                                INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
                                                ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
@@ -43,10 +43,11 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
                                                ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
                                                INNER JOIN FH_clinicalDW.Heme.vContactDate
                                                ON FH_clinicalDW.Heme.vFactFacilityBilling.ContactDateKey = FH_clinicalDW.Heme.vContactDate.ContactDateKey
-                                               WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode LIKE ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
+                                               WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
     data$PatientMRN <- as.factor(data$PatientMRN)
-    data$ContactDate <- as.Date(data$ContactDate, format = "%Y-%m-%d")
-    data = data[order(data$PatientMRN, data$DxCode),]
+    data$ContactDateDesc <- as.Date(data$ContactDateDesc, format = "%b %d, %Y")
+    data <- dplyr::rename(data, ContactDate = ContactDateDesc)
+    data <- data[order(data$PatientMRN, data$DxCode),]
     if(format == "raw") {
         return(data)
     }

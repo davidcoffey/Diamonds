@@ -16,7 +16,7 @@
 #' @return Returns a data frame with patient labs from the Diamonds database.
 #' @export
 #' @importFrom reshape melt cast
-#' @import stringr DBI
+#' @import stringr DBI dplyr
 extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(labs)){
         labs <- "LIKE '%'"
@@ -33,8 +33,9 @@ extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw"
                                                PatientMRN,
                                                Observation,
                                                ObservationId,
-                                               ObservationDate,
-                                               ObservationTime,
+                                               ObservationDateDesc,
+                                               ObservationMilitaryHour,
+                                               ObservationMinute,
                                                DaysFromFirstObservation,
                                                ObservationValue,
                                                ObservationValueNumeric,
@@ -52,8 +53,10 @@ extractLabs <- function(connection, labs = NULL, patients = NULL, format = "raw"
                                                ON FH_clinicalDW.Heme.vObservationTime.ObservationTimeKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationTimeKey
                                                WHERE FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationId ", labs, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
     data$PatientMRN <- as.factor(data$PatientMRN)
-    data$ObservationTime <- gsub(pattern = ":00.0000000", data$ObservationTime, replacement = "")
-    data$ObservationDate <- as.Date(data$ObservationDate, format = "%Y-%m-%d")
+    data$ObservationTime <- paste(data$ObservationMilitaryHour, data$ObservationMinute, sep = ":")
+    data$ObservationDateDesc <- as.Date(data$ObservationDateDesc, format = "%b %d, %Y")
+    data <- dplyr::select(data, -ObservationMilitaryHour, -ObservationMinute)
+    data <- dplyr::rename(data, ObservationDate = ObservationDateDesc)
     data <- data[order(data$PatientMRN, data$ObservationDate),]
     data$ObservationValueNumeric <- ifelse(grepl(pattern = "too small|no spike|polyclonal|normal|oligoclonal|no bence jones|not detectable|not seen", data$ObservationValue, ignore.case = TRUE), 0,
                                            ifelse(grepl(pattern ="g/d|g/24|grams per 24 hours", data$ObservationValue, ignore.case = TRUE),
