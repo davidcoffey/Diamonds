@@ -17,7 +17,7 @@
 #' @import stringr DBI dplyr
 extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(diagnoses)){
-        diagnoses <- "'%'"
+        diagnoses <- "LIKE '%'"
     } else {
         diagnoses <- paste("IN ('", paste(diagnoses, collapse = "', '"), "')", sep = "")
     }
