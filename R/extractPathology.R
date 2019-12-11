@@ -13,7 +13,8 @@
 #' is created with the numeric value only.  Less or greater than symbols are
 #' removed and the median is reported for ranges.  N/As are converted to 0.
 #' @export
-#' @import DBI stats stringr
+#' @import DBI stringr
+#' @importFrom stats median
 extractPathology <- function(connection, patients = NULL, parsePlasmacells = FALSE, n = -1) {
     if(is.null(patients)){
         patients <- "LIKE '%'"

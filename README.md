@@ -128,10 +128,10 @@ library(odbc)
 odbc::odbcListDrivers()
 ```
 
-#### Download Diamonds package from GitHub in R
+#### Download Nexus package from GitHub in R
 ```
 install.packages("devtools")
-devtools::install_github("davidcoffey/Diamonds")
+devtools::install_github("davidcoffey/Nexus")
 ```
 
 ### Basic examples
@@ -140,7 +140,7 @@ devtools::install_github("davidcoffey/Diamonds")
 ```
 library(DBI)
 library(odbc)
-library(Diamonds)
+library(Nexus)
 congo <- DBI::dbConnect(odbc::odbc(), "CONGO-H", uid = "fhcrc\\username", pwd = rstudioapi::askForPassword("Database password"))
 ```
 

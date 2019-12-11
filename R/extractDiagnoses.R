@@ -14,7 +14,8 @@
 #' the Diamonds database.
 #' @export
 #' @importFrom reshape melt cast
-#' @import stringr DBI dplyr
+#' @importFrom dplyr rename
+#' @import stringr DBI
 extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, format = "raw", n = -1) {
     if(is.null(diagnoses)){
         diagnoses <- "LIKE '%'"
