@@ -39,7 +39,7 @@ extractSurvival <- function(connection, patients = NULL, CaisisDiagnosis = "Mult
     status.patients <- paste("IN ('", paste(patients, collapse = "', '"), "')", sep = "")
     LastLabDate <- DBI::dbGetQuery(connection, paste("SELECT
                                                       PatientMRN,
-                                                      MAX(ObservationDateDesc) AS 'LastLabDate'
+                                                      MAX(ObservationDate) AS 'LastLabDate'
                                                       FROM
                                                       FH_clinicalDW.Heme.vExam
                                                       INNER JOIN FH_clinicalDW.Heme.vFactDiagnosticExam ON FH_clinicalDW.Heme.vExam.ExamKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ExamKey
@@ -47,7 +47,7 @@ extractSurvival <- function(connection, patients = NULL, CaisisDiagnosis = "Mult
                                                       INNER JOIN FH_clinicalDW.Heme.vObservationDate ON FH_clinicalDW.Heme.vObservationDate.ObservationDateKey = FH_clinicalDW.Heme.vFactDiagnosticExam.ObservationDateKey
                                                       WHERE FH_clinicalDW.Heme.vPatient.PatientMRN ", status.patients, "GROUP BY(PatientMRN)", sep = ""))
 
-    LastLabDate$LastLabDate <- as.Date(LastLabDate$LastLabDate, format = "%b %d, %Y")
+    LastLabDate$LastLabDate <- as.Date(LastLabDate$LastLabDate, format = "%Y-%m-%d")
     survival <- unique(Reduce(function(x, y) merge(x, y, all=TRUE), list(DiamondsDiagnosisDate, CaisisDiagnosisDate, AliveDate, DiamondsDeathStatus, CaisisDeathStatus, LastLabDate)))
     survival$EarliestDiagnosisDate <- pmin(survival$CaisisDiagnosisDate, survival$DiamondsDiagnosisDate, na.rm = TRUE)
     survival$LastDate <- pmax(survival$LastLabDate, survival$CaisisLastAliveDate, survival$CaisisDeathDate, survival$DiamondsDeathDate, na.rm = TRUE)

@@ -1,4 +1,4 @@
-# Nexus v0.4.3
+# Nexus v0.4.4
 Nexus is a user friendly, open-source software package written in the R programming language that provides a seamless integration of Caisis and Diamonds clinical databases at the Fred Hutch.  It is intended for data scientists to reduce the effort required to prepare data for statistical and exploratory analyses.  It requires credentials which can be obtained for investigators of IRB approved protocols.
 
 ### Features of Nexus
