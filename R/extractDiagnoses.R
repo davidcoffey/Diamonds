@@ -36,7 +36,7 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
                                                CCSLevel1Name,
                                                CCSLevel2Name,
                                                CCSLevel3Name,
-                                               ContactDateDesc
+                                               ContactDate
                                                FROM FH_clinicalDW.Heme.vDiagnosis
                                                INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
                                                ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
@@ -46,8 +46,7 @@ extractDiagnoses <- function(connection, diagnoses = NULL, patients = NULL, form
                                                ON FH_clinicalDW.Heme.vFactFacilityBilling.ContactDateKey = FH_clinicalDW.Heme.vContactDate.ContactDateKey
                                                WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode ", diagnoses, " AND FH_clinicalDW.Heme.vPatient.PatientMRN ", patients, sep = ""), n)
     data$PatientMRN <- as.factor(data$PatientMRN)
-    data$ContactDateDesc <- as.Date(data$ContactDateDesc, format = "%b %d, %Y")
-    data <- dplyr::rename(data, ContactDate = ContactDateDesc)
+    data$ContactDate <- as.Date(data$ContactDate, format = "%Y-%m-%d")
     data <- data[order(data$PatientMRN, data$DxCode),]
     if(format == "raw") {
         return(data)

@@ -11,7 +11,7 @@
 #' length in months will be computed from the earliest date of diagnosis between Caisis and Diamonds.
 #' @param CaisisGroup Caisis disease group from which to extract the last known alive date.
 #' @return Returns a data frame with PatientMRN, date of birth, last known alive date, last lab date,
-#' and surival status and death dates from both Caisis and Diamonds databases.
+#' last billing date, and surival status and death dates from both Caisis and Diamonds databases.
 #' From this information, the most recent date ('LastDate') is determined and the survival in
 #' months is computed between this date and the date of earliest date of diagnosis reported in
 #' Caisis and Diamonds ('SurvivalMonths'). The surival status is the must up-to-date status from
@@ -48,9 +48,24 @@ extractSurvival <- function(connection, patients = NULL, CaisisDiagnosis = "Mult
                                                       WHERE FH_clinicalDW.Heme.vPatient.PatientMRN ", status.patients, "GROUP BY(PatientMRN)", sep = ""))
 
     LastLabDate$LastLabDate <- as.Date(LastLabDate$LastLabDate, format = "%Y-%m-%d")
-    survival <- unique(Reduce(function(x, y) merge(x, y, all=TRUE), list(DiamondsDiagnosisDate, CaisisDiagnosisDate, AliveDate, DiamondsDeathStatus, CaisisDeathStatus, LastLabDate)))
+
+    LastBillingDate <- DBI::dbGetQuery(connection, paste("SELECT
+                                                          PatientMRN,
+                                                          MAX(ContactDate) AS 'LastBillingDate'
+                                                          FROM FH_clinicalDW.Heme.vDiagnosis
+                                                          INNER JOIN FH_clinicalDW.Heme.vFactFacilityBilling
+                                                          ON FH_clinicalDW.Heme.vDiagnosis.DiagnosisKey = FH_clinicalDW.Heme.vFactFacilityBilling.DiagnosisKey
+                                                          INNER JOIN FH_clinicalDW.Heme.vPatient
+                                                          ON FH_clinicalDW.Heme.vFactFacilityBilling.PatientKey = FH_clinicalDW.Heme.vPatient.PatientKey
+                                                          INNER JOIN FH_clinicalDW.Heme.vContactDate
+                                                          ON FH_clinicalDW.Heme.vFactFacilityBilling.ContactDateKey = FH_clinicalDW.Heme.vContactDate.ContactDateKey
+                                                          WHERE FH_clinicalDW.Heme.vDiagnosis.DxCode LIKE '%' AND FH_clinicalDW.Heme.vPatient.PatientMRN ", status.patients, "GROUP BY(PatientMRN)", sep = ""))
+
+    LastBillingDate$LastBillingDate <- as.Date(LastBillingDate$LastBillingDate, format = "%Y-%m-%d")
+
+    survival <- unique(Reduce(function(x, y) merge(x, y, all=TRUE), list(DiamondsDiagnosisDate, CaisisDiagnosisDate, AliveDate, DiamondsDeathStatus, CaisisDeathStatus, LastLabDate, LastBillingDate)))
     survival$EarliestDiagnosisDate <- pmin(survival$CaisisDiagnosisDate, survival$DiamondsDiagnosisDate, na.rm = TRUE)
-    survival$LastDate <- pmax(survival$LastLabDate, survival$CaisisLastAliveDate, survival$CaisisDeathDate, survival$DiamondsDeathDate, na.rm = TRUE)
+    survival$LastDate <- pmax(survival$LastLabDate, survival$LastBillingDate, survival$CaisisLastAliveDate, survival$CaisisDeathDate, survival$DiamondsDeathDate, na.rm = TRUE)
     survival$Status <- ifelse((survival$DiamondsDeathStatus == "Dead" & !(is.na(survival$DiamondsDeathStatus))) | (survival$CaisisDeathStatus == "Dead" & !(is.na(survival$CaisisDeathStatus))), "Dead",
                               ifelse((Sys.Date() - survival$LastLabDate) < 180 | ((Sys.Date() - survival$CaisisLastAliveDate) < 180 & !(is.na(survival$CaisisLastAliveDate))), "Alive", "Unknown"))
     survival$SurvivalMonths <- round((survival$LastDate - survival$EarliestDiagnosisDate)/30, digits = 2)
